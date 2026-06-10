@@ -5,11 +5,9 @@ function rectsOverlap(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
-// Yie Ar Kung-Fu rule: one flat sky color, a horizon, minimal decoration.
-const STAGES = [
-  { sky: '#141021', ground: '#2a2532', line: '#3f3a4e', deco: '#0d0a14', moon: '#9a94ac' },  // moonlit courtyard
-  { sky: '#1a0d0d', ground: '#2e2020', line: '#4e3030', deco: '#120808', moon: '#c8643c' },  // the warlord's pit
-];
+// Stage backdrops are authored as pixel art in art.js (STAGE_ART).
+const STAGES = STAGE_ART;
+const TRAIL_COLORS = { iceball: '#7ce0f8', spear: '#b8b8c4', ring: '#48c048' };
 
 class Match {
   // opts: { p1, p2: char ids, mode: 'cpu'|'vs', aiLevel }
@@ -33,9 +31,24 @@ class Match {
     this.finished = false;
     this.winnerIdx = -1;
     this.stage = STAGES[opts.stage || 0] || STAGES[0];
+    this.backdrop = bakeStage(this.stage);
+    this.stageAnims = (this.stage.anims || []).map(a => ({
+      x: a.x, y: a.y, period: a.period,
+      frames: a.order.map(k => bakeFrame(a.frames[k], a.palette, { noShade: true })),
+    }));
+    this.sparkSheets = {
+      hit: bakeSheet(SPARK_FRAMES, SPARK_HIT_PALETTE, { noShade: true }),
+      block: bakeSheet(SPARK_FRAMES, SPARK_BLOCK_PALETTE, { noShade: true }),
+    };
+    this.sparks = [];
+    this.t = 0;
     this.finishWinner = -1;
     this.finisherFX = null;
     this.startRound();
+  }
+
+  addSpark(x, y, kind, big) {
+    this.sparks.push({ x, y, kind, big: !!big, t: 0 });
   }
 
   startRound() {
@@ -77,6 +90,10 @@ class Match {
   }
 
   update() {
+    this.t++;                                   // free-running clock (stage anims)
+    for (let i = this.sparks.length - 1; i >= 0; i--) {
+      if (++this.sparks[i].t > 8) this.sparks.splice(i, 1);
+    }
     // during FINISH THEM only the winner keeps control
     const live = (i) => this.phase === 'fight' ||
                         (this.phase === 'finish' && i === this.finishWinner);
@@ -278,6 +295,7 @@ class Match {
       def.takeBlock(0, d.blockstun, d.kb);
       this.cornerPush(att, def, d.kb);
       this.particles.spark(contactX, contactY, -def.facing);
+      this.addSpark(contactX, contactY, 'block', d.heavy);
       SFX.block();
       this.hitstop = 2;
       if (d.dash) {                  // blocked dash: bounce off, punishable
@@ -328,6 +346,7 @@ class Match {
     this.cornerPush(att, def, d.kb);
 
     this.particles.blood(contactX, contactY, att.facing, d.heavy ? 14 : 7, d.heavy ? 1.4 : 1);
+    this.addSpark(contactX, contactY, 'hit', d.heavy);
     if (shatter) { this.particles.ice(def.x, def.y - 20); SFX.shatter(); }
     else if (d.heavy) SFX.heavyHit();
     else SFX.hit();
@@ -352,6 +371,9 @@ class Match {
     for (const p of this.projectiles) {
       p.t++;
       p.x += p.vx;
+      if (p.t % 2 === 0) {        // fading energy trail
+        this.particles.trail(p.x - p.vx * 2, p.y + 4, TRAIL_COLORS[p.def.kind] || '#888');
+      }
       if (p.x < -20 || p.x > GAME_W + 20) { p.dead = true; continue; }
 
       const def = this.fighters[0] === p.owner ? this.fighters[1] : this.fighters[0];
@@ -369,6 +391,7 @@ class Match {
       if (def.isBlocking()) {
         def.takeBlock(p.def.chip, 14, 1.6);
         this.particles.spark(p.x, p.y, -def.facing);
+        this.addSpark(p.x, p.y, 'block', false);
         SFX.block();
         if (def.hp <= 0) {                       // chip KO
           if (deciding || this.phase === 'finish') this.enterFinish(ownerIdx, def);
@@ -447,6 +470,7 @@ class Match {
 
     this.drawProjectiles(g);
     this.particles.draw(g);
+    this.drawSparks(g);
     g.restore();
 
     this.drawHUD(g);
@@ -455,28 +479,23 @@ class Match {
   }
 
   drawStage(g) {
-    // flat Yie Ar Kung-Fu backdrop: one sky color, a horizon, a moon, 2 pillars
-    const st = this.stage;
-    g.fillStyle = st.sky;
-    g.fillRect(0, 0, GAME_W, GAME_H);
-    // chunky moon
-    g.fillStyle = st.moon;
-    g.fillRect(248, 30, 16, 16);
-    g.fillRect(244, 34, 24, 8);
-    g.fillRect(252, 26, 8, 24);
-    g.fillStyle = st.sky;
-    g.fillRect(248, 30, 6, 6);   // crater notch
-    // distant pillar silhouettes
-    g.fillStyle = st.deco;
-    g.fillRect(34, 96, 18, FLOOR_Y - 96);
-    g.fillRect(30, 90, 26, 8);
-    g.fillRect(268, 96, 18, FLOOR_Y - 96);
-    g.fillRect(264, 90, 26, 8);
-    // ground
-    g.fillStyle = st.ground;
-    g.fillRect(0, FLOOR_Y, GAME_W, GAME_H - FLOOR_Y);
-    g.fillStyle = st.line;
+    g.drawImage(this.backdrop, 0, 0);
+    for (const a of this.stageAnims) {
+      const f = a.frames[(this.t / a.period | 0) % a.frames.length];
+      g.drawImage(f.cv, a.x, a.y);
+    }
+    g.fillStyle = this.stage.line;
     g.fillRect(0, FLOOR_Y, GAME_W, 2);
+  }
+
+  drawSparks(g) {
+    for (const s of this.sparks) {
+      const f = this.sparkSheets[s.kind][s.t < 4 ? 'spark_a' : 'spark_b'];
+      const scale = s.big ? 2 : 1;
+      g.drawImage(f.cv,
+        Math.round(s.x) - (f.w * scale >> 1), Math.round(s.y) - (f.h * scale >> 1),
+        f.w * scale, f.h * scale);
+    }
   }
 
   drawProjectiles(g) {

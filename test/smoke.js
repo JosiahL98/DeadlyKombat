@@ -358,6 +358,33 @@ const scenarioCode = `
     }
   }
 
+  // 16b. portrait sanity: one per fighter, rows within 20 cols, chars painted
+  for (const id of ROSTER.concat([BOSS_ID])) {
+    const p = PORTRAIT_ART[id];
+    assert(p, 'missing portrait for ' + id);
+    for (const row of p.frame.r) {
+      assert(row.length <= 20, 'portrait ' + id + ' row wider than 20: ' + row.length);
+      for (const ch of row) {
+        assert(ch === '.' || p.palette[ch], 'portrait ' + id + ' unpainted char "' + ch + '"');
+      }
+    }
+  }
+
+  // 17. stage art sanity: 80x50 grids, every char resolvable in the palette
+  assert(STAGE_ART.length === 3, 'expected 3 stages, got ' + STAGE_ART.length);
+  for (const st of STAGE_ART) {
+    assert(st.rows.length === 50, 'stage ' + st.name + ' has ' + st.rows.length + ' rows');
+    for (const row of st.rows) {
+      assert(row.length <= 80, 'stage ' + st.name + ' row wider than 80');
+      for (const ch of row) {
+        assert(st.palette[ch], 'stage ' + st.name + ' unpainted char "' + ch + '"');
+      }
+    }
+    for (const a of st.anims || []) {
+      for (const k of a.order) assert(a.frames[k], 'stage ' + st.name + ' anim missing frame ' + k);
+    }
+  }
+
   return failures;
 })()
 `;

@@ -25,11 +25,18 @@ class ParticleSystem {
   spark(x, y, dir)          { this.burst(x, y, dir, 4, SPARK_COLORS, 0.7); }
   ice(x, y)                 { this.burst(x, y, 0, 14, ICE_COLORS, 1.2); }
 
+  // stationary fading dot (projectile trails) -- no physics
+  trail(x, y, color) {
+    this.list.push({ x, y, vx: 0, vy: 0, size: 2, color, life: 12,
+                     grounded: false, still: true });
+  }
+
   update() {
     for (let i = this.list.length - 1; i >= 0; i--) {
       const p = this.list[i];
       p.life--;
       if (p.life <= 0) { this.list.splice(i, 1); continue; }
+      if (p.still) { p.size = p.life > 6 ? 2 : 1; continue; }
       if (!p.grounded) {
         p.x += p.vx;
         p.y += p.vy;

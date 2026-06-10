@@ -6,7 +6,7 @@
 const ATTACKS = {
   lp: {
     name: 'LOW PUNCH',
-    anim: [['punch_wind', 3], ['lpunch', 4], ['punch_wind', 4]],
+    anim: [['punch_wind', 3], ['lpunch', 4], ['punch_follow', 2], ['punch_wind', 2]],
     startup: 3, active: 3,
     dmg: 5, hitstun: 14, blockstun: 7, kb: 1.4,
     hitbox: { x: 6, y: -30, w: 22, h: 8 },
@@ -14,7 +14,7 @@ const ATTACKS = {
   },
   hp: {
     name: 'HIGH PUNCH',
-    anim: [['punch_wind', 4], ['hpunch', 5], ['punch_wind', 5]],
+    anim: [['punch_wind', 4], ['hpunch', 5], ['punch_follow', 3], ['punch_wind', 2]],
     startup: 4, active: 4,
     dmg: 8, hitstun: 18, blockstun: 9, kb: 2.0,
     hitbox: { x: 6, y: -36, w: 24, h: 8 },
@@ -22,7 +22,7 @@ const ATTACKS = {
   },
   lk: {
     name: 'LOW KICK',
-    anim: [['kick_wind', 5], ['lkick', 5], ['kick_wind', 5]],
+    anim: [['kick_wind', 5], ['lkick', 5], ['kick_follow', 3], ['kick_wind', 2]],
     startup: 5, active: 4,
     dmg: 7, hitstun: 16, blockstun: 8, kb: 1.8,
     hitbox: { x: 6, y: -22, w: 24, h: 8 },
@@ -30,7 +30,7 @@ const ATTACKS = {
   },
   hk: {
     name: 'HIGH KICK',
-    anim: [['kick_wind', 6], ['hkick', 6], ['kick_wind', 6]],
+    anim: [['kick_wind', 6], ['hkick', 6], ['kick_follow', 4], ['kick_wind', 2]],
     startup: 6, active: 5,
     dmg: 11, hitstun: 22, blockstun: 11, kb: 3.0,
     hitbox: { x: 6, y: -38, w: 26, h: 12 },
@@ -46,7 +46,7 @@ const ATTACKS = {
   },
   uppercut: {
     name: 'UPPERCUT',
-    anim: [['upc_wind', 7], ['upc_hit', 6], ['upc_hit', 16]],
+    anim: [['upc_wind', 7], ['upc_hit', 6], ['upc_hit', 8], ['upc_follow', 8]],
     startup: 7, active: 5,
     dmg: 15, hitstun: 0, blockstun: 12, kb: 2.0,
     hitbox: { x: 2, y: -52, w: 16, h: 34 },
@@ -166,7 +166,6 @@ const CHARACTERS = {
     id: 'voltan', name: 'VOLTAN',
     tagline: 'GOD OF THE STORM',
     palette: 'voltan', altPalette: 'voltan_alt',
-    portraitArt: 'voltan',
     specials: [
       {
         id: 'torpedo', name: 'STORM TORPEDO',
@@ -188,7 +187,6 @@ const CHARACTERS = {
     id: 'striker', name: 'STRIKER',
     tagline: 'THE LAST SOLDIER',
     palette: 'striker', altPalette: 'striker_alt',
-    portraitArt: 'striker',
     specials: [
       {
         id: 'ring', name: 'PULSE RING',
@@ -214,7 +212,6 @@ const CHARACTERS = {
     id: 'gorruk', name: 'GORRUK',
     tagline: 'WARLORD OF THE PIT',
     palette: 'gorruk', altPalette: 'gorruk',
-    portraitArt: 'gorruk',
     frameSet: 'gorruk',               // uses GORRUK_FRAMES instead of the ninja set
     dmgMul: 1.35,                     // boss hits harder
     noLaunch: true,                   // too massive to be uppercut-juggled
@@ -236,6 +233,9 @@ const CHARACTERS = {
       crouch: 'block', block_crouch: 'block', jump: 'idle_a',
       jump_kick: 'punch', juggle: 'hit', dazed: 'hit', getup: 'block',
       throw_proj: 'punch', kick_wind: 'punch_wind', sweep: 'punch',
+      walk_c: 'walk_a', walk_d: 'walk_b', idle_c: 'idle_a',
+      punch_follow: 'punch_wind', kick_follow: 'punch_wind',
+      upc_follow: 'slam_wind', win_b: 'win',
     },
     specials: [{
       id: 'g_lunge', name: 'RAMPAGE',

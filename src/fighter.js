@@ -11,7 +11,7 @@ class Fighter {
     const frames = this.char.frameSet === 'gorruk' ? GORRUK_FRAMES : NINJA_FRAMES;
     this.sheet = bakeSheet(frames, PALETTES[paletteKey]);
     this.iceSheet = bakeSheet(frames, PALETTES.ice);
-    this.flashSheet = bakeSheet(frames, PALETTES.flash);
+    this.flashSheet = bakeSheet(frames, PALETTES.flash, { noShade: true });
     // characters with their own frame set alias the poses they lack
     for (const sheet of [this.sheet, this.iceSheet, this.flashSheet]) {
       for (const key in NINJA_FRAMES) {
@@ -431,8 +431,8 @@ class Fighter {
   // ---- sprite selection ----
   spriteKey() {
     switch (this.state) {
-      case 'idle':   return (this.animT / 24 | 0) % 2 ? 'idle_b' : 'idle_a';
-      case 'walk':   return (this.animT / 8 | 0) % 2 ? 'walk_b' : 'walk_a';
+      case 'idle':   return ['idle_a', 'idle_b', 'idle_c', 'idle_b'][(this.animT / 14 | 0) % 4];
+      case 'walk':   return ['walk_a', 'walk_b', 'walk_c', 'walk_d'][(this.animT / 7 | 0) % 4];
       case 'crouch': return 'crouch';
       case 'block':  return 'block';
       case 'blockcrouch': return 'block_crouch';
@@ -446,7 +446,7 @@ class Fighter {
       case 'frozen': return this.frozenSprite || 'hit';
       case 'speared': return 'hit';
       case 'dazed':  return 'dazed';
-      case 'win':    return 'win';
+      case 'win':    return (this.animT / 12 | 0) % 2 ? 'win_b' : 'win';
       case 'special': {
         const sp = this.special;
         return sp ? this.animFrameKey(sp.def.anim, sp.t) : 'idle_a';
@@ -479,10 +479,14 @@ class Fighter {
     if (this.state === 'frozen') sheet = this.iceSheet;
     else if (this.flash > 0) sheet = this.flashSheet;
     const f = sheet[key];
-    // soft ground shadow
+    // soft ground shadow that tightens as the fighter rises
     if (this.state !== 'dead' && this.state !== 'down') {
+      const air = Math.max(0, FLOOR_Y - this.y);
+      const w = Math.round(Math.max(8, 20 - air / 5));
       g.fillStyle = 'rgba(0,0,0,0.35)';
-      g.fillRect(Math.round(this.x) - 10, FLOOR_Y, 20, 2);
+      g.fillRect(Math.round(this.x) - (w >> 1), FLOOR_Y, w, 2);
+      g.fillStyle = 'rgba(0,0,0,0.18)';
+      g.fillRect(Math.round(this.x) - (w >> 1) - 2, FLOOR_Y, w + 4, 1);
     }
     const sway = this.state === 'dazed' ? Math.round(Math.sin(this.animT / 6) * 1.5) : 0;
     drawFrame(g, f, this.x + sway, this.y, this.facing < 0);

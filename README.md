@@ -56,8 +56,8 @@ hurtboxes (green), pushboxes (blue), state + frame data.
 | `src/fighter.js` | fighter state machine, input buffer, dash/teleport, reactions |
 | `src/characters.js` | frame data, hit/hurt/push boxes, roster + boss defs |
 | `src/ai.js` | CPU opponents (reaction-delayed, 4 presets incl. boss) |
-| `src/art.js` | all sprites as pixel strings (ninja set + boss set + portraits) |
-| `src/sprites.js` | bakes pixel strings to offscreen canvases |
+| `src/art.js` | all sprites as pixel strings (ninja set + boss set + portraits + 3 stage backdrops) |
+| `src/sprites.js` | bake pipeline: EPX 2x upscale + top-lit auto-shading, then offscreen canvases |
 | `src/audio.js` | Web Audio synth: hits, whiffs, announcer voice, jingles |
 | `src/particles.js` | blood / sparks / ice shards |
 | `src/font.js` | 3x5 pixel font |
@@ -67,4 +67,17 @@ hurtboxes (green), pushboxes (blue), state + frame data.
 
 - `node test/smoke.js` — headless engine test (stubs the DOM; exercises every
   special, blocking, FINISH THEM/finisher, boss match, AI vs AI, input fuzz).
-- `node test/render_sheet.js` — renders every sprite frame to `test/art_preview.png`.
+- `node test/render_sheet.js` — renders every sprite frame (through the real
+  EPX + shading pipeline) to `test/art_preview.png` and the stage backdrops to
+  `test/art_stages.png`.
+
+## Graphics pipeline
+
+Sprites are authored as chunky character grids and refined at bake time:
+EPX/Scale2x doubles the resolution (rounding staircase diagonals), then a
+top-lit auto-shading pass adds highlight/shadow ramps per palette color
+(~18 effective tones per fighter). Fighters animate with 4-frame walks,
+3-frame breathing idles, and followthrough frames on attacks. Stages are
+full-screen pixel-art backdrops (80x50 grids, same pipeline) with animated
+decorations: brazier flames, lantern glows, twinkling stars. Hits and blocks
+flash sprite-based sparks; projectiles leave fading trails.
