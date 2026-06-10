@@ -64,10 +64,10 @@ class TitleScreen {
       }
     }
 
-    drawText(g, 'P1: WASD MOVE  R/T HI PUNCH/KICK  F/G LO  H BLOCK', GAME_W / 2, 152, 1, '#6f6f7a', 'center');
-    drawText(g, 'P2: ARROWS     U/I HI PUNCH/KICK  J/K LO  L BLOCK', GAME_W / 2, 162, 1, '#6f6f7a', 'center');
+    drawText(g, 'P1: WASD MOVE  R/T HI PUNCH/KICK  F/G LO PUNCH/KICK  H BLOCK', GAME_W / 2, 152, 1, '#6f6f7a', 'center');
+    drawText(g, 'P2: ARROWS     U/I HI PUNCH/KICK  J/K LO PUNCH/KICK  L BLOCK', GAME_W / 2, 162, 1, '#6f6f7a', 'center');
     drawText(g, 'DOWN+HIGH PUNCH = UPPERCUT   BACK+LOW KICK = SWEEP', GAME_W / 2, 176, 1, '#4a4a56', 'center');
-    drawText(g, 'P: PAUSE   TILDE: DEBUG   FINISH THEM WITH AN UPPERCUT', GAME_W / 2, 188, 1, '#5a1818', 'center');
+    drawText(g, 'P: PAUSE   FINISH THEM WITH AN UPPERCUT', GAME_W / 2, 188, 1, '#5a1818', 'center');
   }
 }
 
