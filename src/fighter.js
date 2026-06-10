@@ -322,6 +322,15 @@ class Fighter {
         break;
     }
 
+    // gravity safety net: states that don't manage their own physics must
+    // never hover (e.g. speared or struck out of the air mid-juggle)
+    if (this.y < FLOOR_Y &&
+        !['jump', 'airattack', 'juggle', 'ko', 'frozen'].includes(this.state)) {
+      this.vy += GRAVITY;
+      this.y += this.vy;
+      if (this.y >= FLOOR_Y) { this.y = FLOOR_Y; this.vy = 0; }
+    }
+
     // wall clamp
     this.x = Math.max(WALL_PAD, Math.min(GAME_W - WALL_PAD, this.x));
   }
@@ -382,6 +391,7 @@ class Fighter {
       this.pulledBy = opts.attacker;
       this.spearStun = 70;
       this.vx = 0;
+      this.vy = 0;          // if caught mid-air, the safety net drops them
       return;
     }
     if (opts.launch) {
@@ -390,7 +400,9 @@ class Fighter {
       this.vy = opts.launch.vy;
       return;
     }
-    if (this.airborne || this.state === 'juggle') {
+    // altitude-aware: a frozen (or otherwise off-the-ground) target struck
+    // mid-air must fall, not snap into a grounded hitstun
+    if (this.airborne || this.y < FLOOR_Y - 0.5) {
       this.state = 'juggle';
       this.vx = -this.facing * 1.4;
       this.vy = Math.min(this.vy, -2.4);

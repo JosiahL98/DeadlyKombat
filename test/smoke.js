@@ -149,6 +149,8 @@ const scenarioCode = `
     for (const k of ['hpP','lpP','hkP','lkP']) p[k] = Math.random() < 0.08;
     return p;
   };
+  const hoverFrames = [0, 0];
+  const airStates = ['jump', 'airattack', 'juggle', 'ko', 'frozen'];
   for (let i = 0; i < 20000 && !m.finished; i++) {
     m.update();
     const [a, b] = m.fighters;
@@ -156,6 +158,17 @@ const scenarioCode = `
       failures.push('fuzz produced NaN at frame ' + i);
       break;
     }
+    // hover detector: grounded-logic states may only be above the floor briefly
+    let hovering = false;
+    m.fighters.forEach((f, fi) => {
+      if (f.y < FLOOR_Y - 1 && !airStates.includes(f.state)) hoverFrames[fi]++;
+      else hoverFrames[fi] = 0;
+      if (hoverFrames[fi] > 90) {
+        failures.push('fighter ' + fi + ' hovering in state ' + f.state + ' at frame ' + i);
+        hovering = true;
+      }
+    });
+    if (hovering) break;
   }
 
   // 8. human-style special inputs, including a rolled (down held into forward)
@@ -279,6 +292,28 @@ const scenarioCode = `
   frames = 0;
   while (!m.finished && frames < 60 * 60 * 8) { m.update(); frames++; }
   assert(m.finished, 'boss match never finished (phase ' + m.phase + ', round ' + m.round + ')');
+
+  // 13b. hover regression: a fighter struck out of the air must always land.
+  // (Bug: spearing a juggled opponent left them floating at juggle height.)
+  m = new Match({ p1: 'ashkar', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  globalThis.readPad = () => neutralPad();
+  let vic = m.fighters[1];
+  vic.state = 'juggle'; vic.y = FLOOR_Y - 40; vic.vy = -1; vic.vx = 0;
+  vic.takeHit(4, { spear: true, attacker: m.fighters[0] });
+  for (let i = 0; i < 400; i++) m.update();
+  assert(vic.y >= FLOOR_Y - 0.01,
+    'speared mid-air left opponent hovering at y=' + vic.y + ' state=' + vic.state);
+
+  m = new Match({ p1: 'kiro', p2: 'ashkar', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  vic = m.fighters[1];
+  vic.state = 'frozen'; vic.frozenSprite = 'hit'; vic.freezeT = 300;
+  vic.y = FLOOR_Y - 30; vic.vy = 0;
+  vic.takeHit(6, { hitstun: 16, kb: 1.5 });   // shattered while airborne
+  for (let i = 0; i < 400; i++) m.update();
+  assert(vic.y >= FLOOR_Y - 0.01,
+    'mid-air shatter left opponent hovering at y=' + vic.y + ' state=' + vic.state);
 
   // 14. ladder config is consistent
   assert(LADDER_AI_LEVELS.length === ROSTER.length + 1, 'ladder levels != rungs');

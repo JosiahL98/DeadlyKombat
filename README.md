@@ -17,10 +17,10 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 
 | Fighter | Style | Specials |
 |---|---|---|
-| KIRO | ice ninja | D,F + Low Punch — Ice Blast (freeze; next hit shatters for bonus) |
-| ASHKAR | fire ninja | B,F + Low Punch — Flame Spear (pulls the opponent in, stun) |
-| VOLTAN | thunder god | B,F + High Punch — Storm Torpedo (dash)  /  D,B + Low Punch — Thunder Step (teleport behind) |
-| STRIKER | soldier | D,F + Low Punch — Pulse Ring  /  D,B + Low Kick — Scissor Takedown |
+| KIRO | ice ninja | Down, Forward + Low Punch — Ice Blast (freeze; next hit shatters for bonus) |
+| ASHKAR | fire ninja | Back, Forward + Low Punch — Flame Spear (pulls the opponent in, stun) |
+| VOLTAN | thunder god | Back, Forward + High Punch — Storm Torpedo (dash)  /  Down, Back + Low Punch — Thunder Step (teleport behind) |
+| STRIKER | soldier | Down, Forward + Low Punch — Pulse Ring  /  Down, Back + Low Kick — Scissor Takedown |
 | GORRUK | boss, AI only | Crusher, Quake Slam, Rampage lunge — 1.35x damage, can't be launched |
 
 ## Controls

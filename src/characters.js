@@ -143,7 +143,7 @@ const CHARACTERS = {
         freeze: 100,
       },
     }],
-    moveHint: 'D,F + LOW PUNCH : ICE BLAST',
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = ICE BLAST'],
   },
   ashkar: {
     id: 'ashkar', name: 'ASHKAR',
@@ -160,7 +160,7 @@ const CHARACTERS = {
         pull: true, rope: true,
       },
     }],
-    moveHint: 'B,F + LOW PUNCH : FLAME SPEAR',
+    moveHint: ['BACK, FORWARD + LOW PUNCH = FLAME SPEAR'],
   },
   voltan: {
     id: 'voltan', name: 'VOLTAN',
@@ -181,7 +181,8 @@ const CHARACTERS = {
         teleport: true, vanish: [6, 16],
       },
     ],
-    moveHint: 'B,F+HI PUNCH: TORPEDO   D,B+LO PUNCH: TELEPORT',
+    moveHint: ['BACK, FORWARD + HIGH PUNCH = TORPEDO',
+               'DOWN, BACK + LOW PUNCH = TELEPORT'],
   },
   striker: {
     id: 'striker', name: 'STRIKER',
@@ -206,7 +207,8 @@ const CHARACTERS = {
         type: 'attack', attack: 'leggrab',
       },
     ],
-    moveHint: 'D,F+LO PUNCH: PULSE RING   D,B+LO KICK: LEG GRAB',
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = PULSE RING',
+               'DOWN, BACK + LOW KICK = LEG GRAB'],
   },
   gorruk: {
     id: 'gorruk', name: 'GORRUK',
@@ -240,7 +242,7 @@ const CHARACTERS = {
       seq: ['B', 'F'], btn: 'hp',
       type: 'attack', attack: 'g_lunge',
     }],
-    moveHint: '',
+    moveHint: [],
   },
 };
 

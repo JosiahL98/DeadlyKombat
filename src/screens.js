@@ -66,8 +66,8 @@ class TitleScreen {
 
     drawText(g, 'P1: WASD MOVE  R/T HI PUNCH/KICK  F/G LO  H BLOCK', GAME_W / 2, 152, 1, '#6f6f7a', 'center');
     drawText(g, 'P2: ARROWS     U/I HI PUNCH/KICK  J/K LO  L BLOCK', GAME_W / 2, 162, 1, '#6f6f7a', 'center');
-    drawText(g, 'D+HP UPPERCUT   B+LK SWEEP   P PAUSE   TILDE DEBUG', GAME_W / 2, 176, 1, '#4a4a56', 'center');
-    drawText(g, 'FINISH THEM WITH AN UPPERCUT', GAME_W / 2, 188, 1, '#5a1818', 'center');
+    drawText(g, 'DOWN+HIGH PUNCH = UPPERCUT   BACK+LOW KICK = SWEEP', GAME_W / 2, 176, 1, '#4a4a56', 'center');
+    drawText(g, 'P: PAUSE   TILDE: DEBUG   FINISH THEM WITH AN UPPERCUT', GAME_W / 2, 188, 1, '#5a1818', 'center');
   }
 }
 
@@ -171,8 +171,10 @@ class SelectScreen {
 
     const sel = this.slots[this.cursor[this.picking]];
     if (sel) {
-      drawText(g, CHARACTERS[sel].tagline, GAME_W / 2, 124, 1, '#8a8a96', 'center');
-      drawText(g, CHARACTERS[sel].moveHint, GAME_W / 2, 136, 1, '#6f6f7a', 'center');
+      drawText(g, CHARACTERS[sel].tagline, GAME_W / 2, 122, 1, '#8a8a96', 'center');
+      CHARACTERS[sel].moveHint.forEach((line, i) => {
+        drawText(g, line, GAME_W / 2, 133 + i * 10, 1, '#6f6f7a', 'center');
+      });
     }
     const who = this.mode === 'vs' ? 'PLAYER ' + (this.picking + 1) + ' SELECT' : 'SELECT WITH A/D + ENTER';
     drawText(g, who, GAME_W / 2, 154, 1, '#e8c838', 'center');
