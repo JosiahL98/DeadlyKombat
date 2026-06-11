@@ -114,6 +114,33 @@ const ATTACKS = {
     dash: { vx: 2.4, from: 5, to: 13 },
     low: true, launch: { vx: 2.2, vy: -5.2 }, heavy: true,
   },
+  lash: {
+    name: 'VIPER LASH',
+    anim: [['punch_wind', 4], ['torpedo', 14], ['punch_wind', 6]],
+    startup: 4, active: 12,
+    dmg: 9, hitstun: 0, blockstun: 11, kb: 2.6,
+    hitbox: { x: 2, y: -32, w: 24, h: 14 },
+    dash: { vx: 4.6, from: 4, to: 16 },
+    knockdown: true, heavy: true,
+  },
+  ram: {
+    name: 'GRANITE RAM',
+    anim: [['punch_wind', 8], ['torpedo', 22], ['punch_wind', 8]],
+    startup: 8, active: 20,
+    dmg: 13, hitstun: 0, blockstun: 14, kb: 3.4,
+    hitbox: { x: 0, y: -36, w: 26, h: 20 },
+    dash: { vx: 3.4, from: 8, to: 28 },
+    knockdown: true, heavy: true,
+  },
+  cyclone: {
+    name: 'CYCLONE KICK',
+    anim: [['kick_wind', 5], ['hkick', 17], ['kick_follow', 4]],
+    startup: 5, active: 16,
+    dmg: 9, hitstun: 0, blockstun: 11, kb: 2.0,
+    hitbox: { x: 2, y: -36, w: 24, h: 16 },
+    dash: { vx: 4.0, from: 5, to: 21 },
+    launch: { vx: 1.6, vy: -5.8 }, heavy: true,
+  },
 
   // ---- GORRUK (boss) moves: slow, huge reach, brutal damage ----
   g_punch: {
@@ -242,6 +269,108 @@ const CHARACTERS = {
     moveHint: ['DOWN, FORWARD + LOW PUNCH = PULSE RING',
                'DOWN, BACK + LOW KICK = LEG GRAB'],
   },
+  vipra: {
+    id: 'vipra', name: 'VIPRA',
+    tagline: 'THE VENOM QUEEN',
+    palette: 'vipra', altPalette: 'vipra_alt',
+    specials: [
+      {
+        id: 'venom', name: 'VENOM ORB',
+        seq: ['D', 'F'], btn: 'hp',
+        anim: [['throw_proj', 10], ['throw_proj', 16]],
+        spawnFrame: 8,
+        proj: {
+          kind: 'venom', speed: 2.6, dmg: 4, chip: 4,
+          y: -30, frames: ['venom_a', 'venom_b'],
+          hitstun: 18, kb: 1.8,
+        },
+      },
+      {
+        id: 'lash', name: 'VIPER LASH',
+        seq: ['B', 'F'], btn: 'lp',
+        type: 'attack', attack: 'lash',
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + HIGH PUNCH = VENOM ORB',
+               'BACK, FORWARD + LOW PUNCH = VIPER LASH'],
+  },
+  nyx: {
+    id: 'nyx', name: 'NYX',
+    tagline: 'THE SILENT SHADOW',
+    palette: 'nyx', altPalette: 'nyx_alt',
+    specials: [
+      {
+        id: 'dart', name: 'SHADOW DART',
+        seq: ['B', 'F'], btn: 'lp',
+        anim: [['throw_proj', 8], ['throw_proj', 14]],
+        spawnFrame: 6,
+        proj: {
+          kind: 'dart', speed: 4.2, dmg: 5, chip: 1,
+          y: -30, frames: ['dart_a', 'dart_b'],
+          hitstun: 16, kb: 1.6,
+        },
+      },
+      {
+        id: 'veil', name: 'VEIL STEP',
+        seq: ['D', 'B'], btn: 'lk',
+        anim: [['jump', 6], ['jump', 10], ['idle_a', 8]],
+        spawnFrame: 6,
+        teleport: true, vanish: [6, 16],
+      },
+    ],
+    moveHint: ['BACK, FORWARD + LOW PUNCH = SHADOW DART',
+               'DOWN, BACK + LOW KICK = VEIL STEP'],
+  },
+  rokkan: {
+    id: 'rokkan', name: 'ROKKAN',
+    tagline: 'THE MOUNTAIN',
+    palette: 'rokkan', altPalette: 'rokkan_alt',
+    specials: [
+      {
+        id: 'quake', name: 'QUAKE WAVE',
+        seq: ['D', 'F'], btn: 'lk',
+        anim: [['throw_proj', 12], ['throw_proj', 18]],
+        spawnFrame: 10,
+        proj: {
+          kind: 'wave', speed: 2.0, dmg: 8, chip: 3,
+          y: -8, frames: ['wave_a', 'wave_b'],
+          hitstun: 20, kb: 2.2,
+        },
+      },
+      {
+        id: 'ram', name: 'GRANITE RAM',
+        seq: ['B', 'F'], btn: 'hp',
+        type: 'attack', attack: 'ram',
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + LOW KICK = QUAKE WAVE',
+               'BACK, FORWARD + HIGH PUNCH = GRANITE RAM'],
+  },
+  sura: {
+    id: 'sura', name: 'SURA',
+    tagline: 'THE WIND DANCER',
+    palette: 'sura', altPalette: 'sura_alt',
+    specials: [
+      {
+        id: 'fan', name: 'GALE FAN',
+        seq: ['D', 'F'], btn: 'lp',
+        anim: [['throw_proj', 10], ['throw_proj', 14]],
+        spawnFrame: 8,
+        proj: {
+          kind: 'fan', speed: 3.4, dmg: 6, chip: 2,
+          y: -30, frames: ['fan_a', 'fan_b'],
+          hitstun: 16, kb: 2.0,
+        },
+      },
+      {
+        id: 'cyclone', name: 'CYCLONE KICK',
+        seq: ['B', 'F'], btn: 'hk',
+        type: 'attack', attack: 'cyclone',
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = GALE FAN',
+               'BACK, FORWARD + HIGH KICK = CYCLONE KICK'],
+  },
   gorruk: {
     id: 'gorruk', name: 'GORRUK',
     tagline: 'WARLORD OF THE PIT',
@@ -250,6 +379,7 @@ const CHARACTERS = {
     dmgMul: 1.35,                     // boss hits harder
     noLaunch: true,                   // too massive to be uppercut-juggled
     walkMul: 0.7,
+    pokeRange: 48,                    // longer arms: the AI swings from farther out
     // every standard input maps onto one of his three moves
     moveMap: {
       hp: 'g_punch', lp: 'g_punch', hk: 'g_slam', lk: 'g_punch',
@@ -280,9 +410,10 @@ const CHARACTERS = {
   },
 };
 
-const ROSTER = ['kiro', 'ashkar', 'voltan', 'striker'];   // selectable fighters
+const ROSTER = ['kiro', 'ashkar', 'voltan', 'striker',
+                'vipra', 'nyx', 'rokkan', 'sura'];        // selectable fighters
 const BOSS_ID = 'gorruk';
-const LADDER_AI_LEVELS = [0, 1, 1, 2, 3];                 // difficulty per rung
+const LADDER_AI_LEVELS = [0, 0, 1, 1, 1, 2, 2, 2, 3];     // difficulty per rung
 
 // Hurt/push boxes by posture (relative to feet anchor, facing-agnostic).
 const BOXES = {

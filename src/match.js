@@ -7,7 +7,10 @@ function rectsOverlap(a, b) {
 
 // Stage backdrops are authored as pixel art in art.js (STAGE_ART).
 const STAGES = STAGE_ART;
-const TRAIL_COLORS = { iceball: '#7ce0f8', spear: '#b8b8c4', ring: '#48c048' };
+const TRAIL_COLORS = {
+  iceball: '#7ce0f8', spear: '#b8b8c4', ring: '#48c048',
+  venom: '#6cc83a', dart: '#9a7ae8', wave: '#c8a050', fan: '#a8e0e0',
+};
 
 class Match {
   // opts: { p1, p2: char ids, mode: 'cpu'|'vs', aiLevel }

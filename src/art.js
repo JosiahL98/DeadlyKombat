@@ -1077,18 +1077,82 @@ const PORTRAIT_ART = {
       '.DDDDDDDD.',
     ]},
   },
-  // soldier: buzz cut + headband
+  // soldier: buzz cut + headband (head narrower than shoulders, like voltan)
   striker: {
     palette: { K: '#10101a', P: '#4a7a3a', S: '#d6a273', D: '#2a2a22' },
     frame: { a: 0, r: [
+      '...KKKK...',
       '..KKKKKK..',
-      '.KKKKKKKK.',
+      '..PPPPPP..',
+      '..SSSSSS..',
+      '..SKSSKS..',
+      '..SSSSSS..',
+      '..SSSSSS..',
+      '..DDDDDD..',
+      '.DDDDDDDD.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // venom assassin: green hood, fang marks painted on the mask
+  vipra: {
+    palette: { P: '#55aa32', S: '#d6a273', K: '#10101a', W: '#e8ecf4', D: '#1e2a1a' },
+    frame: { a: 0, r: [
+      '..PPPPPP..',
       '.PPPPPPPP.',
-      '.SSSSSSSS.',
-      '.SKSSSSKS.',
-      '.SSSSSSSS.',
-      '.SSSSSSSS.',
-      '.SSDDDDSS.',
+      '.PPPPPPPP.',
+      '.PSSSSSSP.',
+      '.PSKSSKSP.',
+      '.PSSSSSSP.',
+      '.PPWPPWPP.',
+      '.PPPPPPPP.',
+      '.DDPPPPDD.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // shadow ninja: fully masked, glowing eyes
+  nyx: {
+    palette: { P: '#4a3a78', W: '#e8e0ff', D: '#1c1830' },
+    frame: { a: 0, r: [
+      '..PPPPPP..',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PPWPPWPP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.DDPPPPDD.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // mountain monk: bald, heavy brow, dark beard, geared shoulders
+  rokkan: {
+    palette: { S: '#d6a273', K: '#10101a', D: '#3a342c', G: '#b08030' },
+    frame: { a: 0, r: [
+      '...SSSS...',
+      '..SSSSSS..',
+      '..SSSSSS..',
+      '..KSSSSK..',
+      '..SKSSKS..',
+      '..SSSSSS..',
+      '..SDDDDS..',
+      '..DDDDDD..',
+      '.GDDDDDDG.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // wind dancer: pale hair framing the face, gold band
+  sura: {
+    palette: { P: '#8ed0d8', S: '#d6a273', K: '#10101a', G: '#c8a030', D: '#2a3438' },
+    frame: { a: 0, r: [
+      '..PPPPPP..',
+      '.PGGGGGGP.',
+      '.PPSSSSPP.',
+      '.PSSSSSSP.',
+      '.PSKSSKSP.',
+      '.PSSSSSSP.',
+      '..SSSSSS..',
+      '..DDDDDD..',
       '.DDDDDDDD.',
       '.DDDDDDDD.',
     ]},
@@ -1142,11 +1206,57 @@ const PROJ_FRAMES = {
     'RR..RR',
     '.RRYR.',
   ]},
+  venom_a: { a: 2, r: [
+    '.VV.',
+    'VvvV',
+    'VvvV',
+    '.VV.',
+  ]},
+  venom_b: { a: 2, r: [
+    '.VV.',
+    'VvvV',
+    '.VV.',
+    '..v.',
+  ]},
+  dart_a: { a: 2, r: [
+    'N..N',
+    '.nn.',
+    '.nn.',
+    'N..N',
+  ]},
+  dart_b: { a: 2, r: [
+    '..N.',
+    'Nnn.',
+    '.nnN',
+    '.N..',
+  ]},
+  wave_a: { a: 3, r: [
+    '..Q...',
+    '.QQ.Q.',
+    'QQQQQQ',
+  ]},
+  wave_b: { a: 3, r: [
+    '....Q.',
+    '.Q.QQ.',
+    'QQQQQQ',
+  ]},
+  fan_a: { a: 2, r: [
+    '.ZZZ.',
+    'Zz.zZ',
+    '.ZZZ.',
+  ]},
+  fan_b: { a: 2, r: [
+    '.ZzZ.',
+    'ZZ.ZZ',
+    '.ZzZ.',
+  ]},
 };
 
 const PROJ_PALETTE = {
   C: '#7ce0f8', W: '#f0fbff', B: '#2e8cc8', G: '#8a6a3a',
   R: '#48c048', Y: '#d8f8b0',
+  V: '#6cc83a', v: '#357a1e', N: '#b09ae8', n: '#5a3a98',
+  Q: '#c8a050', q: '#8a6a30', Z: '#d8f8f4', z: '#6ab8c0',
 };
 
 // ---- fighter palettes ----
@@ -1191,6 +1301,46 @@ const PALETTES = {
     S: '#d6a273', P: '#8a8a4a', p: '#74743c', D: '#3a3a2c', G: '#7a6a4a',
     b: '#26261e', K: '#262620', H: '#262620', B: '#9aa45a',
     C: '#55663a', c: '#6f7f4a', W: '#e8ecf4', k: '#161620',
+  },
+  vipra: {
+    S: '#d6a273', P: '#55aa32', p: '#479028', D: '#1e2a1a', G: '#6f6f7a',
+    b: '#141c12', K: '#10101a', H: '#55aa32', M: '#3f8224',
+    W: '#e8ecf4', k: '#161620',
+  },
+  vipra_alt: {
+    S: '#d6a273', P: '#a8a02e', p: '#8f8826', D: '#1e2a1a', G: '#6f6f7a',
+    b: '#141c12', K: '#10101a', H: '#a8a02e', M: '#787220',
+    W: '#e8ecf4', k: '#161620',
+  },
+  nyx: {
+    S: '#d6a273', P: '#4a3a78', p: '#3e3164', D: '#1c1830', G: '#6f6f7a',
+    b: '#14101e', K: '#0c0a14', H: '#4a3a78', M: '#352a56',
+    W: '#e8e0ff', k: '#100d18',
+  },
+  nyx_alt: {
+    S: '#d6a273', P: '#8c3a6a', p: '#783158', D: '#1c1830', G: '#6f6f7a',
+    b: '#14101e', K: '#0c0a14', H: '#8c3a6a', M: '#642a4c',
+    W: '#e8e0ff', k: '#100d18',
+  },
+  rokkan: {
+    S: '#d6a273', P: '#8c8478', p: '#787264', D: '#3a342c', G: '#b08030',
+    b: '#26221c', K: '#10101a', H: '#8c8478', M: '#6a6458',
+    W: '#e8ecf4', k: '#161620',
+  },
+  rokkan_alt: {
+    S: '#d6a273', P: '#6a7a8c', p: '#5a6878', D: '#3a342c', G: '#b08030',
+    b: '#26221c', K: '#10101a', H: '#6a7a8c', M: '#4e5a68',
+    W: '#e8ecf4', k: '#161620',
+  },
+  sura: {
+    S: '#d6a273', P: '#8ed0d8', p: '#79b8c0', D: '#2a3438', G: '#c8a030',
+    b: '#1c2426', K: '#10101a', H: '#8ed0d8', M: '#68a4ac',
+    W: '#ffffff', k: '#161620',
+  },
+  sura_alt: {
+    S: '#d6a273', P: '#d89ab8', p: '#c084a2', D: '#2a3438', G: '#c8a030',
+    b: '#1c2426', K: '#10101a', H: '#d89ab8', M: '#b06e8c',
+    W: '#ffffff', k: '#161620',
   },
   gorruk: {
     P: '#7a2424', D: '#2a2020', S: '#b87848', K: '#140e0e',

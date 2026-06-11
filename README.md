@@ -7,7 +7,7 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 
 ## Modes
 
-- **TOURNAMENT** — the ladder: 4 opponents in random order (mirror matches
+- **TOURNAMENT** — the ladder: 8 opponents in random order (mirror matches
   possible), then GORRUK, the four-armed boss. Difficulty scales as you climb.
   Lose and you get an arcade continue countdown.
 - **VS CPU** — single match, difficulty selectable (W/S on the select screen).
@@ -21,6 +21,10 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 | ASHKAR | fire ninja | Back, Forward + Low Punch — Flame Spear (pulls the opponent in, stun)  /  Down, Back + High Punch — Phantom Strike (vanishes, strikes from behind) |
 | VOLTAN | thunder god | Back, Forward + High Punch — Storm Torpedo (dash)  /  Down, Back + Low Punch — Thunder Step (teleport behind) |
 | STRIKER | soldier | Down, Forward + Low Punch — Pulse Ring  /  Down, Back + Low Kick — Scissor Takedown |
+| VIPRA | venom queen | Down, Forward + High Punch — Venom Orb (heavy chip damage)  /  Back, Forward + Low Punch — Viper Lash (fast lunge, knocks down) |
+| NYX | silent shadow | Back, Forward + Low Punch — Shadow Dart (fast projectile)  /  Down, Back + Low Kick — Veil Step (teleport behind) |
+| ROKKAN | the mountain | Down, Forward + Low Kick — Quake Wave (slow ground wave)  /  Back, Forward + High Punch — Granite Ram (slow heavy charge) |
+| SURA | wind dancer | Down, Forward + Low Punch — Gale Fan  /  Back, Forward + High Kick — Cyclone Kick (dash launcher, juggle after it) |
 | GORRUK | boss, AI only | Crusher, Quake Slam, Rampage lunge — 1.35x damage, can't be launched |
 
 ## Controls

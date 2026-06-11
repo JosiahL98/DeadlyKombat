@@ -398,6 +398,69 @@ const scenarioCode = `
   assert(m.fighters[0].x > m.fighters[1].x, 'phantom strike did not cross behind the foe');
   assert(phantomHit, 'phantom strike did not connect');
 
+  // 16d. the four newer fighters: every projectile special deals damage,
+  // every attack special connects, NYX's veil step crosses sides
+  for (const [id, ai] of [['vipra', 0], ['nyx', 0], ['rokkan', 0], ['sura', 0]]) {
+    m = new Match({ p1: id, p2: 'kiro', mode: 'vs' });
+    m.phase = 'fight'; m.banner = null;
+    globalThis.readPad = () => neutralPad();
+    m.fighters[0].startSpecial(CHARACTERS[id].specials[ai]);
+    for (let i = 0; i < 220; i++) m.update();
+    assert(m.fighters[1].hp < MAX_HP, id + ' projectile special dealt no damage');
+  }
+  for (const [id, atk] of [['vipra', 'lash'], ['rokkan', 'ram'], ['sura', 'cyclone']]) {
+    m = new Match({ p1: id, p2: 'kiro', mode: 'vs' });
+    m.phase = 'fight'; m.banner = null;
+    globalThis.readPad = () => neutralPad();
+    m.fighters[0].x = 100; m.fighters[1].x = 190;
+    m.fighters[0].startAttack(atk);
+    let connected = false;
+    for (let i = 0; i < 120; i++) {
+      m.update();
+      if (['juggle', 'down', 'hitstun'].includes(m.fighters[1].state)) connected = true;
+    }
+    assert(connected, atk + ' did not connect (foe ' + m.fighters[1].state + ')');
+    assert(m.fighters[0].x > 110, atk + ' did not travel (x=' + m.fighters[0].x + ')');
+  }
+  m = new Match({ p1: 'nyx', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  let veilSent = false;
+  globalThis.readPad = (i) => {
+    const p = neutralPad();
+    if (i === 0 && !veilSent) { p.special = 'veil'; veilSent = true; }
+    return p;
+  };
+  const veilStart = Math.sign(m.fighters[0].x - m.fighters[1].x);
+  for (let i = 0; i < 60; i++) m.update();
+  assert(veilStart !== Math.sign(m.fighters[0].x - m.fighters[1].x),
+    'veil step did not cross to the far side');
+
+  // 16e. AI range discipline: no normal-attack presses outside poke range,
+  // and no short-reach dash specials picked from full screen
+  m = new Match({ p1: 'vipra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  globalThis.readPad = () => neutralPad();
+  const rangeAI = new AI(2);
+  m.fighters[0].x = 100; m.fighters[1].x = 148;        // dist 48: out of poke range
+  let whiffPress = false, anyPress = false;
+  for (let i = 0; i < 80; i++) {
+    rangeAI.plan = null; rangeAI.think = 1;
+    const pad = rangeAI.update(m.fighters[0], m.fighters[1], m);
+    if (pad.hpP || pad.lpP || pad.hkP || pad.lkP) whiffPress = true;
+  }
+  assert(!whiffPress, 'AI pressed attack buttons from 48px (out of poke range)');
+  m.fighters[1].x = 130;                               // dist 30: in range
+  for (let i = 0; i < 200 && !anyPress; i++) {
+    rangeAI.plan = null; rangeAI.think = 1;
+    const pad = rangeAI.update(m.fighters[0], m.fighters[1], m);
+    if (pad.hpP || pad.lpP || pad.hkP || pad.lkP) anyPress = true;
+  }
+  assert(anyPress, 'AI never attacked from inside poke range');
+  for (let i = 0; i < 100; i++) {
+    const sp = rangeAI.pickSpecial(m.fighters[0], m, 250);
+    assert(sp !== 'lash', 'AI picked the short viper lash from 250px away');
+  }
+
   // 17. stage art sanity: 80x50 grids, every char resolvable in the palette
   assert(STAGE_ART.length === 7, 'expected 7 stages, got ' + STAGE_ART.length);
   for (const st of STAGE_ART) {

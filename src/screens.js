@@ -145,44 +145,46 @@ class SelectScreen {
   draw(g) {
     g.fillStyle = '#0d0a14';
     g.fillRect(0, 0, GAME_W, GAME_H);
-    drawText(g, 'CHOOSE YOUR FIGHTER', GAME_W / 2, 16, 2, '#c83030', 'center');
+    drawText(g, 'CHOOSE YOUR FIGHTER', GAME_W / 2, 8, 2, '#c83030', 'center');
 
-    const cellW = 44, cellH = 48, gap = 12;
-    const total = this.slots.length * cellW + (this.slots.length - 1) * gap;
-    const x0 = (GAME_W - total) / 2, y0 = 48;
+    // 2 rows of 4; left/right wraps through all slots
+    const cols = 4, cellW = 44, cellH = 48, gap = 12, rowStride = cellH + 16;
+    const total = cols * cellW + (cols - 1) * gap;
+    const x0 = (GAME_W - total) / 2, y0 = 24;
 
     for (let i = 0; i < this.slots.length; i++) {
-      const x = x0 + i * (cellW + gap);
+      const x = x0 + (i % cols) * (cellW + gap);
+      const y = y0 + (i / cols | 0) * rowStride;
       const id = this.slots[i];
       g.fillStyle = '#1c1726';
-      g.fillRect(x, y0, cellW, cellH);
+      g.fillRect(x, y, cellW, cellH);
       const pf = this.portraits[id];
-      g.drawImage(pf.cv, x + ((cellW - pf.w * 2) >> 1), y0 + 4, pf.w * 2, pf.h * 2);
-      drawText(g, CHARACTERS[id].name, x + cellW / 2, y0 + cellH + 5, 1, '#e8e8f0', 'center');
+      g.drawImage(pf.cv, x + ((cellW - pf.w * 2) >> 1), y + 4, pf.w * 2, pf.h * 2);
+      drawText(g, CHARACTERS[id].name, x + cellW / 2, y + cellH + 5, 1, '#e8e8f0', 'center');
       // cursors
       const blink = (this.t / 10 | 0) % 2 === 0;
       if (this.cursor[0] === i && (this.picking === 0 ? blink : this.picked[0])) {
-        g.strokeStyle = '#3e9cd8'; g.strokeRect(x - 2, y0 - 2, cellW + 4, cellH + 4);
+        g.strokeStyle = '#3e9cd8'; g.strokeRect(x - 2, y - 2, cellW + 4, cellH + 4);
       }
       if (this.mode === 'vs' && this.picking === 1 && this.cursor[1] === i && blink) {
-        g.strokeStyle = '#c87a1e'; g.strokeRect(x - 4, y0 - 4, cellW + 8, cellH + 8);
+        g.strokeStyle = '#c87a1e'; g.strokeRect(x - 4, y - 4, cellW + 8, cellH + 8);
       }
     }
 
     const sel = this.slots[this.cursor[this.picking]];
     if (sel) {
-      drawText(g, CHARACTERS[sel].tagline, GAME_W / 2, 122, 1, '#8a8a96', 'center');
+      drawText(g, CHARACTERS[sel].tagline, GAME_W / 2, 152, 1, '#8a8a96', 'center');
       CHARACTERS[sel].moveHint.forEach((line, i) => {
-        drawText(g, line, GAME_W / 2, 133 + i * 10, 1, '#6f6f7a', 'center');
+        drawText(g, line, GAME_W / 2, 162 + i * 9, 1, '#6f6f7a', 'center');
       });
     }
     const who = this.mode === 'vs' ? 'PLAYER ' + (this.picking + 1) + ' SELECT' : 'SELECT WITH A/D + ENTER';
-    drawText(g, who, GAME_W / 2, 154, 1, '#e8c838', 'center');
+    drawText(g, who, GAME_W / 2, 182, 1, '#e8c838', 'center');
     if (this.mode === 'cpu') {
-      drawText(g, 'DIFFICULTY: ' + DIFFICULTY_NAMES[this.difficulty] + '  (W/S)',
-        GAME_W / 2, 168, 1, '#8a8a96', 'center');
+      drawText(g, 'DIFF: ' + DIFFICULTY_NAMES[this.difficulty] + ' (W/S)',
+        GAME_W - 6, 182, 1, '#8a8a96', 'right');
     }
-    drawText(g, 'ESC: BACK', GAME_W / 2, 184, 1, '#4a4a56', 'center');
+    drawText(g, 'ESC: BACK', 6, 182, 1, '#4a4a56');
   }
 }
 
@@ -228,21 +230,21 @@ class LadderScreen {
     for (let i = 0; i < lad.rungs.length; i++) {
       const id = lad.rungs[i];
       const isBoss = id === BOSS_ID;
-      const y = 158 - i * 27;
+      const y = 171 - i * 17;
       const x = GAME_W / 2 - 40;
       const beaten = i < lad.idx;
       const current = i === lad.idx;
       g.fillStyle = current ? '#241c30' : '#16121e';
-      g.fillRect(x, y, 96, 24);
+      g.fillRect(x, y, 96, 15);
       const pf = this.portraits[id];
       g.globalAlpha = beaten ? 0.3 : 1;
-      g.drawImage(pf.cv, x + 2, y + 2, 20, 20);
-      drawText(g, CHARACTERS[id].name, x + 28, y + 9, 1,
+      g.drawImage(pf.cv, x + 1, y + 1, 13, 13);
+      drawText(g, CHARACTERS[id].name, x + 18, y + 5, 1,
         beaten ? '#4a4a56' : isBoss ? '#c83030' : '#e8e8f0');
       g.globalAlpha = 1;
-      if (beaten) drawText(g, 'X', x + 88, y + 8, 2, '#7a1010');
+      if (beaten) drawText(g, 'X', x + 88, y + 5, 1, '#7a1010');
       if (current && (this.t / 12 | 0) % 2 === 0) {
-        drawText(g, '>', x - 14, y + 8, 2, '#e8c838');
+        drawText(g, '>', x - 12, y + 4, 2, '#e8c838');
       }
     }
 

@@ -27,9 +27,18 @@ class AI {
 
   rnd() { return Math.random(); }
 
-  pickSpecial(me, match) {
-    const ok = me.char.specials.filter(sp =>
-      sp.proj ? !match.hasProjectile(me) : true);
+  pickSpecial(me, match, dist) {
+    const ok = me.char.specials.filter(sp => {
+      if (sp.proj) return !match.hasProjectile(me);
+      if (sp.teleport) return true;
+      if (sp.attack) {
+        const a = ATTACKS[sp.attack];
+        if (a.teleportAt) return true;             // reappears at the foe
+        const travel = a.dash ? a.dash.vx * (a.dash.to - a.dash.from) : 0;
+        return travel + a.hitbox.x + a.hitbox.w + 12 >= dist;
+      }
+      return true;
+    });
     if (!ok.length) return null;
     return ok[(this.rnd() * ok.length) | 0].id;
   }
@@ -89,7 +98,7 @@ class AI {
 
     // --- positioning / offense by range ---
     if (dist > 130) {
-      const sp = this.pickSpecial(me, match);
+      const sp = this.pickSpecial(me, match, dist);
       if (sp && this.rnd() < cfg.specialChance) {
         pad.special = sp;
       } else if (this.rnd() < cfg.jumpiness) {
@@ -100,9 +109,11 @@ class AI {
       return pad;
     }
 
-    if (dist > 55) {
+    // standing pokes reach ~30px past the anchor plus the foe's 10px hurtbox
+    // overhang, so only swing inside ~38px; otherwise keep repositioning
+    if (dist > (me.char.pokeRange || 38)) {
       const r = this.rnd();
-      const sp = this.pickSpecial(me, match);
+      const sp = this.pickSpecial(me, match, dist);
       if (sp && r < cfg.specialChance * 0.6) {
         pad.special = sp;
       } else if (r < cfg.aggression) {
