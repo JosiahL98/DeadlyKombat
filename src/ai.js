@@ -34,6 +34,7 @@ class AI {
       if (sp.attack) {
         const a = ATTACKS[sp.attack];
         if (a.teleportAt) return true;             // reappears at the foe
+        if (a.quake) return true;                  // the whole floor is in range
         const travel = a.dash ? a.dash.vx * (a.dash.to - a.dash.from) : 0;
         return travel + a.hitbox.x + a.hitbox.w + 12 >= dist;
       }
@@ -75,7 +76,7 @@ class AI {
     const foeProj = match.projectiles.find(pr => pr.owner !== me &&
       Math.abs(pr.x - me.x) < 90 && Math.sign(pr.vx) === Math.sign(me.x - pr.x));
     if (foeProj) {
-      const tp = me.char.specials.find(sp => sp.teleport);
+      const tp = me.char.specials.find(sp => sp.teleport || sp.swap);
       if (tp && this.rnd() < 0.5) pad.special = tp.id;            // blink behind it
       else if (this.rnd() < 0.5 && cfg.jumpiness > 0) this.plan = { type: 'jumpin', t: 20, kickAt: -1 };
       else this.plan = { type: 'block', t: 30, low: false };

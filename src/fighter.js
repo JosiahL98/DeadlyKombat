@@ -45,6 +45,7 @@ class Fighter {
     this.pulledBy = null;
     this.holdingDown = false;
     this.koFalling = false;
+    this.poisoned = null;       // {n, dmg, every, t} lingering venom ticks
   }
 
   get foeDir() { return this.facing; }
@@ -216,12 +217,18 @@ class Fighter {
         }
         if (atk.t === atk.def.startup) SFX.whiff();
         const dd = atk.def.dash;
-        if (dd && atk.t >= dd.from && atk.t < dd.to && !atk.hasHit) {
+        if (dd && atk.t >= dd.from && atk.t < dd.to &&
+            (!atk.hasHit || atk.def.rehit)) {     // multi-hit dashes keep carrying
           this.x += dd.vx * this.facing;
           // slammed into the wall: skip straight to recovery
           if (this.x <= WALL_PAD || this.x >= GAME_W - WALL_PAD) {
             atk.t = Math.max(atk.t, atk.total - 8);
           }
+        }
+        // multi-hit attacks rearm their hitbox every `rehit` frames
+        if (atk.hasHit && atk.def.rehit &&
+            atk.t < atk.def.startup + atk.def.active && atk.t % atk.def.rehit === 0) {
+          atk.hasHit = false;
         }
         if (atk.t >= atk.total) {
           this.attack = null;
@@ -233,9 +240,11 @@ class Fighter {
       case 'special': {
         const sp = this.special;
         sp.t++;
-        if (sp.t >= sp.def.spawnFrame && !sp.spawned) {
-          sp.spawned = true;
+        const spawnAt = sp.def.spawnFrames ||
+          (sp.def.spawnFrame != null ? [sp.def.spawnFrame] : []);
+        if (spawnAt.includes(sp.t)) {
           if (sp.def.teleport) match.teleportFighter(this);
+          else if (sp.def.swap) match.swapFighters(this);
           else match.spawnProjectile(this, sp.def);
         }
         if (sp.t >= totalAttackFrames(sp.def)) {
@@ -323,6 +332,17 @@ class Fighter {
       case 'dead':
       case 'win':
         break;
+    }
+
+    // lingering poison: small ticks that can never finish them off
+    if (this.poisoned && !['ko', 'dead', 'win', 'dazed'].includes(this.state)) {
+      if (--this.poisoned.t <= 0) {
+        this.hp = Math.max(1, this.hp - this.poisoned.dmg);
+        this.flash = 2;
+        match.particles.trail(this.x, this.y - 30, '#6cc83a');
+        this.poisoned.t = this.poisoned.every;
+        if (--this.poisoned.n <= 0) this.poisoned = null;
+      }
     }
 
     // gravity safety net: states that don't manage their own physics must

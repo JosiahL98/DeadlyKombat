@@ -422,18 +422,191 @@ const scenarioCode = `
     assert(connected, atk + ' did not connect (foe ' + m.fighters[1].state + ')');
     assert(m.fighters[0].x > 110, atk + ' did not travel (x=' + m.fighters[0].x + ')');
   }
+  // NYX's counter: strike her stance and she ripostes with a knockdown
   m = new Match({ p1: 'nyx', p2: 'kiro', mode: 'vs' });
   m.phase = 'fight'; m.banner = null;
-  let veilSent = false;
+  globalThis.readPad = () => neutralPad();
+  m.fighters[0].x = 150; m.fighters[1].x = 172;
+  m.fighters[0].startSpecial(CHARACTERS.nyx.specials[1]);
+  for (let i = 0; i < 5; i++) m.update();
+  m.fighters[1].startAttack('hp');
+  let countered = false;
+  for (let i = 0; i < 80; i++) {
+    m.update();
+    if (['juggle', 'down'].includes(m.fighters[1].state)) countered = true;
+  }
+  assert(countered, 'night reprisal did not knock the attacker down');
+  assert(m.fighters[0].hp === MAX_HP, 'nyx took damage through her counter');
+  assert(m.fighters[1].hp < MAX_HP, 'riposte dealt no damage');
+
+  // 16f. novel mechanics
+  // drain: LEECHING LASH heals VIPRA for part of the damage
+  m = new Match({ p1: 'vipra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].hp = 50;
+  m.fighters[0].x = 130; m.fighters[1].x = 180;
+  m.fighters[0].startAttack('lash');
+  for (let i = 0; i < 60; i++) m.update();
+  assert(m.fighters[1].hp < MAX_HP, 'leeching lash never connected');
+  assert(m.fighters[0].hp > 50, 'leeching lash did not heal vipra');
+
+  // poison: VENOM ORB keeps ticking after the hit (but can never kill)
+  m = new Match({ p1: 'vipra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].startSpecial(CHARACTERS.vipra.specials[0]);
+  let hpAfterHit = -1;
+  for (let i = 0; i < 300; i++) {
+    m.update();
+    if (hpAfterHit < 0 && m.fighters[1].hp < MAX_HP) hpAfterHit = m.fighters[1].hp;
+  }
+  assert(hpAfterHit > 0, 'venom orb never connected');
+  assert(m.fighters[1].hp < hpAfterHit, 'poison did not tick after the hit');
+
+  // armor: GRANITE RAM absorbs a poke and keeps charging
+  m = new Match({ p1: 'rokkan', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 150; m.fighters[1].x = 180;
+  m.fighters[0].startAttack('ram');
+  m.fighters[1].startAttack('lp');           // faster: would normally interrupt
+  let ramSurvived = false, ramHit = false;
+  for (let i = 0; i < 80; i++) {
+    m.update();
+    if (m.fighters[0].hp < MAX_HP && m.fighters[0].state === 'attack') ramSurvived = true;
+    if (['juggle', 'down'].includes(m.fighters[1].state)) ramHit = true;
+  }
+  assert(ramSurvived, 'granite ram was interrupted instead of armoring through');
+  assert(ramHit, 'granite ram never landed after armoring');
+
+  // multi-hit: CYCLONE KICK connects more than once
+  m = new Match({ p1: 'sura', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 140; m.fighters[1].x = 180;
+  m.fighters[0].startAttack('cyclone');
+  let maxCombo = 0;
+  for (let i = 0; i < 80; i++) {
+    m.update();
+    maxCombo = Math.max(maxCombo, m.combo[0].n);
+  }
+  assert(maxCombo >= 2, 'cyclone kick hit only ' + maxCombo + ' time(s)');
+
+  // boomerang: the gear flies out, turns, and comes home without a hit
+  m = new Match({ p1: 'kogg', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 60; m.fighters[1].x = 290;
+  m.fighters[0].startSpecial(CHARACTERS.kogg.specials[0]);
+  let turned = false;
+  for (let i = 0; i < 200; i++) {
+    m.update();
+    const pr = m.projectiles[0];
+    if (pr && pr.returning) turned = true;
+  }
+  assert(turned, 'gear boomerang never turned back');
+  assert(m.projectiles.length === 0, 'gear boomerang was never caught');
+  assert(m.fighters[1].hp === MAX_HP, 'gear hit a foe standing beyond its range');
+
+  // arc: the hex lob rises, falls, and shatters on the floor
+  m = new Match({ p1: 'shulga', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 40; m.fighters[1].x = 300;
+  m.fighters[0].startSpecial(CHARACTERS.shulga.specials[0]);
+  let rose = false;
+  for (let i = 0; i < 200; i++) {
+    m.update();
+    const pr = m.projectiles[0];
+    if (pr && pr.vy < 0) rose = true;
+  }
+  assert(rose, 'hex lob never arced upward');
+  assert(m.projectiles.length === 0, 'hex lob never burst on the ground');
+
+  // mine: walk onto a bog snare and get knocked down
+  m = new Match({ p1: 'shulga', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 80; m.fighters[1].x = 250;
+  m.fighters[0].startSpecial(CHARACTERS.shulga.specials[1]);
   globalThis.readPad = (i) => {
     const p = neutralPad();
-    if (i === 0 && !veilSent) { p.special = 'veil'; veilSent = true; }
+    if (i === 1) p.left = true;                // walk toward the trap
     return p;
   };
-  const veilStart = Math.sign(m.fighters[0].x - m.fighters[1].x);
-  for (let i = 0; i < 60; i++) m.update();
-  assert(veilStart !== Math.sign(m.fighters[0].x - m.fighters[1].x),
-    'veil step did not cross to the far side');
+  let snared = false;
+  for (let i = 0; i < 300; i++) {
+    m.update();
+    if (['juggle', 'down'].includes(m.fighters[1].state)) snared = true;
+  }
+  assert(snared, 'bog snare never triggered on the approaching foe');
+  globalThis.readPad = () => neutralPad();
+
+  // grab: SKY TOMB goes through a guard but whiffs on an airborne foe
+  m = new Match({ p1: 'magra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 150; m.fighters[1].x = 172;
+  m.fighters[1].state = 'block';
+  m.fighters[0].startAttack('skytomb');
+  let grabbedThruBlock = false;
+  for (let i = 0; i < 60; i++) {
+    m.update();
+    if (['juggle', 'down'].includes(m.fighters[1].state)) grabbedThruBlock = true;
+  }
+  assert(grabbedThruBlock, 'sky tomb was blocked (it must be unblockable)');
+
+  m = new Match({ p1: 'magra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 150; m.fighters[1].x = 172;
+  m.fighters[1].state = 'jump'; m.fighters[1].y = FLOOR_Y - 30; m.fighters[1].vy = 0;
+  m.fighters[0].startAttack('skytomb');
+  for (let i = 0; i < 20; i++) m.update();
+  assert(m.fighters[1].hp === MAX_HP, 'sky tomb grabbed an airborne foe');
+
+  // quake: FAULT LINE hits a grounded foe across the screen
+  m = new Match({ p1: 'magra', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 50; m.fighters[1].x = 290;
+  m.fighters[0].startAttack('faultline');
+  let quaked = false;
+  for (let i = 0; i < 80; i++) {
+    m.update();
+    if (['juggle', 'down'].includes(m.fighters[1].state)) quaked = true;
+  }
+  assert(quaked, 'fault line missed a grounded foe at full screen');
+
+  // swap: RIFT SWAP trades the two fighters' positions
+  m = new Match({ p1: 'miraj', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  const mirajStart = Math.sign(m.fighters[0].x - m.fighters[1].x);
+  m.fighters[0].startSpecial(CHARACTERS.miraj.specials[1]);
+  for (let i = 0; i < 40; i++) m.update();
+  assert(mirajStart !== Math.sign(m.fighters[0].x - m.fighters[1].x),
+    'rift swap did not trade places');
+
+  // volley: PRISM VOLLEY puts two bolts on screen at different heights
+  m = new Match({ p1: 'miraj', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].startSpecial(CHARACTERS.miraj.specials[0]);
+  let twoBolts = false;
+  for (let i = 0; i < 30; i++) {
+    m.update();
+    if (m.projectiles.length === 2 &&
+        m.projectiles[0].y !== m.projectiles[1].y) twoBolts = true;
+  }
+  assert(twoBolts, 'prism volley did not fire two bolts at split heights');
+
+  // reflect: STEAM GEYSER turns an incoming projectile around
+  m = new Match({ p1: 'kogg', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 100; m.fighters[1].x = 250;
+  m.projectiles.push({
+    owner: m.fighters[1],
+    def: { kind: 'ring', speed: 2.8, dmg: 8, chip: 2, y: -30, frames: ['ring_a'] },
+    x: 130, y: m.fighters[0].y - 30, vx: -2.8, vy: 0, t: 0, dead: false, returning: false,
+  });
+  m.fighters[0].startAttack('geyser');
+  let reflected = false;
+  for (let i = 0; i < 30; i++) {
+    m.update();
+    const pr = m.projectiles[0];
+    if (pr && pr.owner === m.fighters[0] && pr.vx > 0) reflected = true;
+  }
+  assert(reflected, 'steam geyser did not reflect the projectile');
 
   // 16e. AI range discipline: no normal-attack presses outside poke range,
   // and no short-reach dash specials picked from full screen

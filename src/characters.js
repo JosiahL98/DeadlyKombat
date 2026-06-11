@@ -94,6 +94,7 @@ const ATTACKS = {
     dmg: 8, hitstun: 0, blockstun: 12, kb: 2.0,
     hitbox: { x: 2, y: -14, w: 24, h: 14 },
     dash: { vx: 4.2, from: 4, to: 20 },
+    crouching: true,                   // slides UNDER high projectiles
     low: true, knockdown: true, heavy: true,
   },
   phantom: {
@@ -115,12 +116,13 @@ const ATTACKS = {
     low: true, launch: { vx: 2.2, vy: -5.2 }, heavy: true,
   },
   lash: {
-    name: 'VIPER LASH',
+    name: 'LEECHING LASH',
     anim: [['punch_wind', 4], ['torpedo', 14], ['punch_wind', 6]],
     startup: 4, active: 12,
     dmg: 9, hitstun: 0, blockstun: 11, kb: 2.6,
     hitbox: { x: 2, y: -32, w: 24, h: 14 },
     dash: { vx: 4.6, from: 4, to: 16 },
+    drain: 0.6,                        // heals VIPRA for 60% of damage dealt
     knockdown: true, heavy: true,
   },
   ram: {
@@ -130,16 +132,45 @@ const ATTACKS = {
     dmg: 13, hitstun: 0, blockstun: 14, kb: 3.4,
     hitbox: { x: 0, y: -36, w: 26, h: 20 },
     dash: { vx: 3.4, from: 8, to: 28 },
+    armor: true,                       // absorbs one hit (half damage) mid-charge
     knockdown: true, heavy: true,
   },
   cyclone: {
     name: 'CYCLONE KICK',
     anim: [['kick_wind', 5], ['hkick', 17], ['kick_follow', 4]],
     startup: 5, active: 16,
-    dmg: 9, hitstun: 0, blockstun: 11, kb: 2.0,
-    hitbox: { x: 2, y: -36, w: 24, h: 16 },
+    dmg: 4, hitstun: 0, blockstun: 11, kb: 2.0,
+    hitbox: { x: 2, y: -44, w: 24, h: 26 },
     dash: { vx: 4.0, from: 5, to: 21 },
-    launch: { vx: 1.6, vy: -5.8 }, heavy: true,
+    rehit: 5,                          // multi-hit: rearms every 5 active frames
+    launch: { vx: 1.2, vy: -4.4 }, heavy: true,
+  },
+  geyser: {
+    name: 'STEAM GEYSER',
+    anim: [['upc_wind', 6], ['upc_hit', 12], ['upc_wind', 8]],
+    startup: 6, active: 12,
+    dmg: 10, hitstun: 0, blockstun: 12, kb: 1.6,
+    hitbox: { x: -2, y: -64, w: 18, h: 50 },
+    reflect: true,                     // the steam blast turns projectiles around
+    launch: { vx: 0.8, vy: -6.5 }, heavy: true,
+  },
+  skytomb: {
+    name: 'SKY TOMB',
+    anim: [['punch_wind', 9], ['hpunch', 5], ['upc_hit', 10]],
+    startup: 9, active: 4,
+    dmg: 16, hitstun: 0, blockstun: 0, kb: 2.0,
+    hitbox: { x: 2, y: -40, w: 14, h: 32 },
+    grab: true,                        // unblockable; whiffs on airborne foes
+    launch: { vx: 2.6, vy: -6.2 }, heavy: true,
+  },
+  faultline: {
+    name: 'FAULT LINE',
+    anim: [['upc_wind', 12], ['kick_wind', 10], ['sweep', 6], ['crouch', 14]],
+    startup: 22, active: 4,
+    dmg: 7, hitstun: 0, blockstun: 0, kb: 2.0,
+    hitbox: { x: 0, y: -10, w: 10, h: 10 },
+    quake: true,                       // hits any grounded foe, anywhere; jump it
+    knockdown: true, heavy: true,
   },
 
   // ---- GORRUK (boss) moves: slow, huge reach, brutal damage ----
@@ -283,16 +314,17 @@ const CHARACTERS = {
           kind: 'venom', speed: 2.6, dmg: 4, chip: 4,
           y: -30, frames: ['venom_a', 'venom_b'],
           hitstun: 18, kb: 1.8,
+          poison: { ticks: 3, dmg: 2, every: 40 },   // lingering venom drip
         },
       },
       {
-        id: 'lash', name: 'VIPER LASH',
+        id: 'lash', name: 'LEECHING LASH',
         seq: ['B', 'F'], btn: 'lp',
         type: 'attack', attack: 'lash',
       },
     ],
-    moveHint: ['DOWN, FORWARD + HIGH PUNCH = VENOM ORB',
-               'BACK, FORWARD + LOW PUNCH = VIPER LASH'],
+    moveHint: ['DOWN, FORWARD + HIGH PUNCH = VENOM ORB (POISONS)',
+               'BACK, FORWARD + LOW PUNCH = LEECHING LASH (DRAINS)'],
   },
   nyx: {
     id: 'nyx', name: 'NYX',
@@ -300,26 +332,25 @@ const CHARACTERS = {
     palette: 'nyx', altPalette: 'nyx_alt',
     specials: [
       {
-        id: 'dart', name: 'SHADOW DART',
+        id: 'dart', name: 'DART VOLLEY',
         seq: ['B', 'F'], btn: 'lp',
-        anim: [['throw_proj', 8], ['throw_proj', 14]],
-        spawnFrame: 6,
+        anim: [['throw_proj', 8], ['throw_proj', 8], ['throw_proj', 8]],
+        spawnFrames: [6, 14],          // two darts in quick succession
         proj: {
-          kind: 'dart', speed: 4.2, dmg: 5, chip: 1,
+          kind: 'dart', speed: 4.2, dmg: 4, chip: 1,
           y: -30, frames: ['dart_a', 'dart_b'],
-          hitstun: 16, kb: 1.6,
+          hitstun: 16, kb: 1.6, volley: true,
         },
       },
       {
-        id: 'veil', name: 'VEIL STEP',
+        id: 'reprisal', name: 'NIGHT REPRISAL',
         seq: ['D', 'B'], btn: 'lk',
-        anim: [['jump', 6], ['jump', 10], ['idle_a', 8]],
-        spawnFrame: 6,
-        teleport: true, vanish: [6, 16],
+        anim: [['block', 4], ['block', 22], ['idle_a', 8]],
+        counter: { from: 4, to: 26, dmg: 12 },   // struck mid-stance: vanish + riposte
       },
     ],
-    moveHint: ['BACK, FORWARD + LOW PUNCH = SHADOW DART',
-               'DOWN, BACK + LOW KICK = VEIL STEP'],
+    moveHint: ['BACK, FORWARD + LOW PUNCH = DART VOLLEY',
+               'DOWN, BACK + LOW KICK = NIGHT REPRISAL (COUNTER)'],
   },
   rokkan: {
     id: 'rokkan', name: 'ROKKAN',
@@ -335,6 +366,7 @@ const CHARACTERS = {
           kind: 'wave', speed: 2.0, dmg: 8, chip: 3,
           y: -8, frames: ['wave_a', 'wave_b'],
           hitstun: 20, kb: 2.2,
+          low: true, knockdown: true,  // rolls along the ground: block it low
         },
       },
       {
@@ -343,8 +375,8 @@ const CHARACTERS = {
         type: 'attack', attack: 'ram',
       },
     ],
-    moveHint: ['DOWN, FORWARD + LOW KICK = QUAKE WAVE',
-               'BACK, FORWARD + HIGH PUNCH = GRANITE RAM'],
+    moveHint: ['DOWN, FORWARD + LOW KICK = QUAKE WAVE (HITS LOW)',
+               'BACK, FORWARD + HIGH PUNCH = GRANITE RAM (ARMORED)'],
   },
   sura: {
     id: 'sura', name: 'SURA',
@@ -357,9 +389,9 @@ const CHARACTERS = {
         anim: [['throw_proj', 10], ['throw_proj', 14]],
         spawnFrame: 8,
         proj: {
-          kind: 'fan', speed: 3.4, dmg: 6, chip: 2,
+          kind: 'fan', speed: 3.4, dmg: 5, chip: 2,
           y: -30, frames: ['fan_a', 'fan_b'],
-          hitstun: 16, kb: 2.0,
+          launch: { vx: 1.4, vy: -4.6 },   // the gust lifts them: juggle follow-up
         },
       },
       {
@@ -368,8 +400,117 @@ const CHARACTERS = {
         type: 'attack', attack: 'cyclone',
       },
     ],
-    moveHint: ['DOWN, FORWARD + LOW PUNCH = GALE FAN',
-               'BACK, FORWARD + HIGH KICK = CYCLONE KICK'],
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = GALE FAN (LIFTS THEM)',
+               'BACK, FORWARD + HIGH KICK = CYCLONE KICK (MULTI-HIT)'],
+  },
+  kogg: {
+    id: 'kogg', name: 'KOGG',
+    tagline: 'THE BRASS GOLEM',
+    palette: 'kogg', altPalette: 'kogg_alt',
+    specials: [
+      {
+        id: 'gear', name: 'GEAR BOOMERANG',
+        seq: ['B', 'F'], btn: 'lp',
+        anim: [['throw_proj', 10], ['throw_proj', 16]],
+        spawnFrame: 8,
+        proj: {
+          kind: 'gear', speed: 3.0, dmg: 7, chip: 2,
+          y: -30, frames: ['gear_a', 'gear_b'],
+          hitstun: 18, kb: 2.0,
+          boomerang: 34,               // flies out, then whirls back to his hand
+        },
+      },
+      {
+        id: 'geyser', name: 'STEAM GEYSER',
+        seq: ['D', 'B'], btn: 'hk',
+        type: 'attack', attack: 'geyser',
+      },
+    ],
+    moveHint: ['BACK, FORWARD + LOW PUNCH = GEAR BOOMERANG (RETURNS)',
+               'DOWN, BACK + HIGH KICK = STEAM GEYSER (REFLECTS SHOTS)'],
+  },
+  shulga: {
+    id: 'shulga', name: 'SHULGA',
+    tagline: 'THE BOG WITCH',
+    palette: 'shulga', altPalette: 'shulga_alt',
+    specials: [
+      {
+        id: 'hex', name: 'HEX LOB',
+        seq: ['D', 'F'], btn: 'hp',
+        anim: [['throw_proj', 12], ['throw_proj', 14]],
+        spawnFrame: 10,
+        proj: {
+          kind: 'hex', speed: 2.4, dmg: 9, chip: 3,
+          y: -34, frames: ['hex_a', 'hex_b'],
+          hitstun: 20, kb: 2.2, knockdown: true,
+          arc: { vy: -4.0, g: 0.16 },  // sails over other projectiles
+        },
+      },
+      {
+        id: 'snare', name: 'BOG SNARE',
+        seq: ['D', 'B'], btn: 'lp',
+        anim: [['throw_proj', 12], ['crouch', 12]],
+        spawnFrame: 10,
+        proj: {
+          kind: 'mine', speed: 0, dmg: 7, chip: 2,
+          y: -4, place: 58, frames: ['mine_a', 'mine_b'],
+          low: true, knockdown: true,
+          mine: { arm: 24, life: 300 },  // sits and waits to be stepped on
+        },
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + HIGH PUNCH = HEX LOB (ARCS OVERHEAD)',
+               'DOWN, BACK + LOW PUNCH = BOG SNARE (GROUND TRAP)'],
+  },
+  magra: {
+    id: 'magra', name: 'MAGRA',
+    tagline: 'THE TEMPLE WALL',
+    palette: 'magra', altPalette: 'magra_alt',
+    walkMul: 0.85,
+    specials: [
+      {
+        id: 'skytomb', name: 'SKY TOMB',
+        seq: ['B', 'F'], btn: 'hp',
+        type: 'attack', attack: 'skytomb',
+      },
+      {
+        id: 'faultline', name: 'FAULT LINE',
+        seq: ['D', 'B'], btn: 'hk',
+        type: 'attack', attack: 'faultline',
+      },
+    ],
+    moveHint: ['BACK, FORWARD + HIGH PUNCH = SKY TOMB (UNBLOCKABLE GRAB)',
+               'DOWN, BACK + HIGH KICK = FAULT LINE (JUMP OR EAT IT)'],
+  },
+  miraj: {
+    id: 'miraj', name: 'MIRAJ',
+    tagline: 'THE FACELESS MIRAGE',
+    palette: 'miraj', altPalette: 'miraj_alt',
+    specials: [
+      {
+        id: 'prism', name: 'PRISM VOLLEY',
+        seq: ['D', 'F'], btn: 'lp',
+        anim: [['throw_proj', 10], ['throw_proj', 16]],
+        spawnFrame: 8,
+        projs: [                       // twin bolts: block high THEN low
+          { kind: 'prism', speed: 3.6, dmg: 5, chip: 2,
+            y: -34, frames: ['prism_a', 'prism_b'],
+            hitstun: 16, kb: 1.8, volley: true },
+          { kind: 'prism', speed: 2.2, dmg: 5, chip: 2,
+            y: -8, frames: ['prism_a', 'prism_b'],
+            hitstun: 16, kb: 1.8, volley: true, low: true },
+        ],
+      },
+      {
+        id: 'rift', name: 'RIFT SWAP',
+        seq: ['D', 'B'], btn: 'hp',
+        anim: [['jump', 6], ['jump', 8], ['idle_a', 8]],
+        spawnFrame: 6,
+        swap: true, vanish: [4, 12],   // both fighters trade places
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = PRISM VOLLEY (HI + LO)',
+               'DOWN, BACK + HIGH PUNCH = RIFT SWAP (TRADE PLACES)'],
   },
   gorruk: {
     id: 'gorruk', name: 'GORRUK',
@@ -411,9 +552,10 @@ const CHARACTERS = {
 };
 
 const ROSTER = ['kiro', 'ashkar', 'voltan', 'striker',
-                'vipra', 'nyx', 'rokkan', 'sura'];        // selectable fighters
+                'vipra', 'nyx', 'rokkan', 'sura',
+                'kogg', 'shulga', 'magra', 'miraj'];      // selectable fighters
 const BOSS_ID = 'gorruk';
-const LADDER_AI_LEVELS = [0, 0, 1, 1, 1, 2, 2, 2, 3];     // difficulty per rung
+const LADDER_AI_LEVELS = [0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3];  // per rung
 
 // Hurt/push boxes by posture (relative to feet anchor, facing-agnostic).
 const BOXES = {

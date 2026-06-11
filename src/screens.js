@@ -73,6 +73,7 @@ class TitleScreen {
 // ---------------- FIGHTER SELECT ----------------
 const DIFFICULTY_NAMES = ['EASY', 'NORMAL', 'HARD'];
 let lastDifficulty = 1;               // remembered across rematches
+const SELECT_COLS = 6;                // select grid: 2 rows of 6
 
 class SelectScreen {
   constructor(mode) {
@@ -98,20 +99,22 @@ class SelectScreen {
     if (Input.hit['Escape']) { setScreen(new TitleScreen()); return; }
     if (this.mode === 'cpu') {
       const n = DIFFICULTY_NAMES.length;
-      if (Input.hit['KeyW'] || Input.hit['ArrowUp'])   { this.difficulty = (this.difficulty + 1) % n; SFX.select(); }
-      if (Input.hit['KeyS'] || Input.hit['ArrowDown']) { this.difficulty = (this.difficulty + n - 1) % n; SFX.select(); }
+      if (Input.hit['KeyE']) { this.difficulty = (this.difficulty + 1) % n; SFX.select(); }
+      if (Input.hit['KeyQ']) { this.difficulty = (this.difficulty + n - 1) % n; SFX.select(); }
       lastDifficulty = this.difficulty;
     }
     const p = this.picking;
     const maps = p === 0
-      ? ['KeyA', 'KeyD', 'Enter']
-      : ['ArrowLeft', 'ArrowRight', 'Enter'];
+      ? ['KeyA', 'KeyD', 'KeyW', 'KeyS', 'Enter']
+      : ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'];
     // either player can also confirm with their own attack buttons
-    const confirm = Input.hit[maps[2]] || Input.hit['Space'] ||
+    const confirm = Input.hit[maps[4]] || Input.hit['Space'] ||
       (p === 0 ? Input.hit['KeyF'] || Input.hit['KeyR'] : Input.hit['KeyJ'] || Input.hit['KeyU']);
 
     if (Input.hit[maps[0]]) this.moveCursor(-1);
     if (Input.hit[maps[1]]) this.moveCursor(1);
+    if (Input.hit[maps[2]]) this.moveCursor(-SELECT_COLS);
+    if (Input.hit[maps[3]]) this.moveCursor(SELECT_COLS);
 
     if (confirm) {
       SFX.confirm();
@@ -147,8 +150,8 @@ class SelectScreen {
     g.fillRect(0, 0, GAME_W, GAME_H);
     drawText(g, 'CHOOSE YOUR FIGHTER', GAME_W / 2, 8, 2, '#c83030', 'center');
 
-    // 2 rows of 4; left/right wraps through all slots
-    const cols = 4, cellW = 44, cellH = 48, gap = 12, rowStride = cellH + 16;
+    // 2 rows of 6; A/D wrap through all slots, W/S hop between rows
+    const cols = SELECT_COLS, cellW = 40, cellH = 48, gap = 8, rowStride = cellH + 16;
     const total = cols * cellW + (cols - 1) * gap;
     const x0 = (GAME_W - total) / 2, y0 = 24;
 
@@ -178,10 +181,10 @@ class SelectScreen {
         drawText(g, line, GAME_W / 2, 162 + i * 9, 1, '#6f6f7a', 'center');
       });
     }
-    const who = this.mode === 'vs' ? 'PLAYER ' + (this.picking + 1) + ' SELECT' : 'SELECT WITH A/D + ENTER';
+    const who = this.mode === 'vs' ? 'PLAYER ' + (this.picking + 1) + ' SELECT' : 'SELECT: A/D/W/S + ENTER';
     drawText(g, who, GAME_W / 2, 182, 1, '#e8c838', 'center');
     if (this.mode === 'cpu') {
-      drawText(g, 'DIFF: ' + DIFFICULTY_NAMES[this.difficulty] + ' (W/S)',
+      drawText(g, 'DIFF: ' + DIFFICULTY_NAMES[this.difficulty] + ' (Q/E)',
         GAME_W - 6, 182, 1, '#8a8a96', 'right');
     }
     drawText(g, 'ESC: BACK', 6, 182, 1, '#4a4a56');
@@ -226,12 +229,13 @@ class LadderScreen {
     drawText(g, 'THE TOURNAMENT', GAME_W / 2, 12, 2, '#c83030', 'center');
 
     const lad = this.ladder;
-    // tower of opponents: next fight at the bottom of what remains
+    // tower of opponents in two columns: climb the left, then the right
+    const colRungs = 7;
     for (let i = 0; i < lad.rungs.length; i++) {
       const id = lad.rungs[i];
       const isBoss = id === BOSS_ID;
-      const y = 171 - i * 17;
-      const x = GAME_W / 2 - 40;
+      const y = 158 - (i % colRungs) * 17;
+      const x = GAME_W / 2 - 102 + ((i / colRungs) | 0) * 108;
       const beaten = i < lad.idx;
       const current = i === lad.idx;
       g.fillStyle = current ? '#241c30' : '#16121e';
@@ -253,11 +257,11 @@ class LadderScreen {
     drawText(g, 'YOU:', 18, 138, 1, '#8a8a96');
     drawText(g, CHARACTERS[lad.player].name, 18, 184, 1, '#e8c838');
 
-    drawText(g, 'NEXT: ' + CHARACTERS[lad.rungs[lad.idx]].name, GAME_W - 14, 150, 1, '#e8e8f0', 'right');
+    drawText(g, 'NEXT: ' + CHARACTERS[lad.rungs[lad.idx]].name, GAME_W - 14, 178, 1, '#e8e8f0', 'right');
     if ((this.t / 20 | 0) % 2 === 0) {
-      drawText(g, 'ENTER: FIGHT', GAME_W - 14, 164, 1, '#e8c838', 'right');
+      drawText(g, 'ENTER: FIGHT', GAME_W - 14, 189, 1, '#e8c838', 'right');
     }
-    drawText(g, 'ESC: QUIT', GAME_W - 14, 184, 1, '#4a4a56', 'right');
+    drawText(g, 'ESC: QUIT', GAME_W / 2, 189, 1, '#4a4a56', 'center');
   }
 }
 

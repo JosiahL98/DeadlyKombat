@@ -7,11 +7,14 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 
 ## Modes
 
-- **TOURNAMENT** — the ladder: 8 opponents in random order (mirror matches
+- **TOURNAMENT** — the ladder: 12 opponents in random order (mirror matches
   possible), then GORRUK, the four-armed boss. Difficulty scales as you climb.
   Lose and you get an arcade continue countdown.
-- **VS CPU** — single match, difficulty selectable (W/S on the select screen).
+- **VS CPU** — single match, difficulty selectable (Q/E on the select screen).
 - **2 PLAYERS** — local versus on one keyboard.
+
+On the select screen move with A/D and hop rows with W/S (P1) or the arrow
+keys (P2).
 
 ## Roster
 
@@ -21,11 +24,17 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 | ASHKAR | fire ninja | Back, Forward + Low Punch — Flame Spear (pulls the opponent in, stun)  /  Down, Back + High Punch — Phantom Strike (vanishes, strikes from behind) |
 | VOLTAN | thunder god | Back, Forward + High Punch — Storm Torpedo (dash)  /  Down, Back + Low Punch — Thunder Step (teleport behind) |
 | STRIKER | soldier | Down, Forward + Low Punch — Pulse Ring  /  Down, Back + Low Kick — Scissor Takedown |
-| VIPRA | venom queen | Down, Forward + High Punch — Venom Orb (heavy chip damage)  /  Back, Forward + Low Punch — Viper Lash (fast lunge, knocks down) |
-| NYX | silent shadow | Back, Forward + Low Punch — Shadow Dart (fast projectile)  /  Down, Back + Low Kick — Veil Step (teleport behind) |
-| ROKKAN | the mountain | Down, Forward + Low Kick — Quake Wave (slow ground wave)  /  Back, Forward + High Punch — Granite Ram (slow heavy charge) |
-| SURA | wind dancer | Down, Forward + Low Punch — Gale Fan  /  Back, Forward + High Kick — Cyclone Kick (dash launcher, juggle after it) |
+| VIPRA | venom queen | Down, Forward + High Punch — Venom Orb (poisons: damage ticks after the hit)  /  Back, Forward + Low Punch — Leeching Lash (lunge that heals her for damage dealt) |
+| NYX | silent shadow | Back, Forward + Low Punch — Dart Volley (two darts back to back)  /  Down, Back + Low Kick — Night Reprisal (counter stance: strike her and she blinks behind you and ripostes) |
+| ROKKAN | the mountain | Down, Forward + Low Kick — Quake Wave (ground wave, must be blocked low)  /  Back, Forward + High Punch — Granite Ram (armored charge: absorbs one hit) |
+| SURA | wind dancer | Down, Forward + Low Punch — Gale Fan (lifts the foe for a juggle)  /  Back, Forward + High Kick — Cyclone Kick (multi-hit carrying launcher) |
+| KOGG | brass golem | Back, Forward + Low Punch — Gear Boomerang (returns; threatens twice)  /  Down, Back + High Kick — Steam Geyser (anti-air launcher that reflects projectiles) |
+| SHULGA | bog witch | Down, Forward + High Punch — Hex Lob (arcs over other projectiles)  /  Down, Back + Low Punch — Bog Snare (plants a ground trap that pops when stepped on) |
+| MAGRA | temple colossus | Back, Forward + High Punch — Sky Tomb (unblockable grab; whiffs on airborne foes)  /  Down, Back + High Kick — Fault Line (slow stomp that hits every grounded foe anywhere — jump it) |
+| MIRAJ | faceless mirage | Down, Forward + Low Punch — Prism Volley (twin bolts, one high one low)  /  Down, Back + High Punch — Rift Swap (both fighters trade places) |
 | GORRUK | boss, AI only | Crusher, Quake Slam, Rampage lunge — 1.35x damage, can't be launched |
+
+KIRO's Ice Slide also ducks under high projectiles mid-slide.
 
 ## Controls
 

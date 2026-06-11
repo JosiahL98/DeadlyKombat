@@ -1157,6 +1157,70 @@ const PORTRAIT_ART = {
       '.DDDDDDDD.',
     ]},
   },
+  // clockwork golem: riveted brass head, glowing eye lights, vent grill
+  kogg: {
+    palette: { P: '#7a8694', G: '#c8a030', W: '#9ae8ff', D: '#2a3038' },
+    frame: { a: 0, r: [
+      '..PPPPPP..',
+      '..PPPPPP..',
+      '..GPPPPG..',
+      '..PPPPPP..',
+      '..PWPPWP..',
+      '..PPPPPP..',
+      '..PGGGGP..',
+      '..DDDDDD..',
+      '.GDDDDDDG.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // bog witch: pointed hood, sickly skin, one glowing eye
+  shulga: {
+    palette: { P: '#3a5a52', S: '#b8c89a', K: '#10141a', W: '#d8e8b0', D: '#22302c' },
+    frame: { a: 0, r: [
+      '....PP....',
+      '...PPPP...',
+      '..PPPPPP..',
+      '.PPPPPPPP.',
+      '..SSSSSS..',
+      '..SKSSWS..',
+      '..SSSSSS..',
+      '..SDDDDS..',
+      '.DDDDDDDD.',
+      '.DDDDDDDD.',
+    ]},
+  },
+  // temple colossus: golden helm and pauldrons, stern face
+  magra: {
+    palette: { G: '#d8b848', S: '#c08858', K: '#10101a', D: '#4a3a20' },
+    frame: { a: 0, r: [
+      '...GGGG...',
+      '..GGGGGG..',
+      '..GGGGGG..',
+      '..SSSSSS..',
+      '..SKSSKS..',
+      '..SSSSSS..',
+      '..SSSSSS..',
+      '..GGGGGG..',
+      '.GGDDDDGG.',
+      '.DGGGGGGD.',
+    ]},
+  },
+  // faceless mirage: blank ivory mask under a magenta cowl
+  miraj: {
+    palette: { P: '#b84a98', S: '#e8e0d0', D: '#3a2434' },
+    frame: { a: 0, r: [
+      '..PPPPPP..',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PSSSSSSP.',
+      '.PSSSSSSP.',
+      '.PSSSSSSP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.DDPPPPDD.',
+      '.DDDDDDDD.',
+    ]},
+  },
   // the boss: heavy brow, tusks
   gorruk: {
     palette: { S: '#b87848', K: '#140e0e', W: '#e8e8f0', P: '#7a2424' },
@@ -1250,6 +1314,54 @@ const PROJ_FRAMES = {
     'ZZ.ZZ',
     '.ZzZ.',
   ]},
+  gear_a: { a: 2, r: [
+    'O.O.O',
+    '.OOO.',
+    'OOoOO',
+    '.OOO.',
+    'O.O.O',
+  ]},
+  gear_b: { a: 2, r: [
+    '.O.O.',
+    'OOOOO',
+    '.OoO.',
+    'OOOOO',
+    '.O.O.',
+  ]},
+  hex_a: { a: 2, r: [
+    '.VV.',
+    'VWWV',
+    'VvvV',
+    '.VV.',
+  ]},
+  hex_b: { a: 2, r: [
+    '.VV.',
+    'VvvV',
+    'VWWV',
+    '.VV.',
+  ]},
+  mine_a: { a: 3, r: [
+    '..VV..',
+    '.VvvV.',
+    'VvmmvV',
+    'mmmmmm',
+  ]},
+  mine_b: { a: 3, r: [
+    '.W.V..',
+    '.VvvV.',
+    'VvmmvV',
+    'mmmmmm',
+  ]},
+  prism_a: { a: 1, r: [
+    '.I.',
+    'IiI',
+    '.I.',
+  ]},
+  prism_b: { a: 1, r: [
+    '.i.',
+    'iIi',
+    '.i.',
+  ]},
 };
 
 const PROJ_PALETTE = {
@@ -1257,6 +1369,8 @@ const PROJ_PALETTE = {
   R: '#48c048', Y: '#d8f8b0',
   V: '#6cc83a', v: '#357a1e', N: '#b09ae8', n: '#5a3a98',
   Q: '#c8a050', q: '#8a6a30', Z: '#d8f8f4', z: '#6ab8c0',
+  O: '#c89838', o: '#7a5c20', I: '#f8d0ec', i: '#c050a0',
+  m: '#2a4438',
 };
 
 // ---- fighter palettes ----
@@ -1340,6 +1454,46 @@ const PALETTES = {
   sura_alt: {
     S: '#d6a273', P: '#d89ab8', p: '#c084a2', D: '#2a3438', G: '#c8a030',
     b: '#1c2426', K: '#10101a', H: '#d89ab8', M: '#b06e8c',
+    W: '#ffffff', k: '#161620',
+  },
+  kogg: {
+    S: '#9aa4ae', P: '#7a8694', p: '#68737f', D: '#2a3038', G: '#c8a030',
+    b: '#1e242a', K: '#10141a', H: '#7a8694', M: '#5c6670',
+    W: '#9ae8ff', k: '#161a20',
+  },
+  kogg_alt: {
+    S: '#c09a78', P: '#a86a3a', p: '#925a30', D: '#2a3038', G: '#c8a030',
+    b: '#1e242a', K: '#10141a', H: '#a86a3a', M: '#7c4e2a',
+    W: '#9ae8ff', k: '#161a20',
+  },
+  shulga: {
+    S: '#b8c89a', P: '#3a5a52', p: '#314d46', D: '#22302c', G: '#7a6a4a',
+    b: '#182220', K: '#10141a', H: '#3a5a52', M: '#2a423c',
+    W: '#d8e8b0', k: '#12181a',
+  },
+  shulga_alt: {
+    S: '#b8c89a', P: '#6a4a7a', p: '#5a3e68', D: '#22302c', G: '#7a6a4a',
+    b: '#182220', K: '#10141a', H: '#6a4a7a', M: '#4c3458',
+    W: '#d8e8b0', k: '#12181a',
+  },
+  magra: {
+    S: '#c08858', P: '#d8b848', p: '#c0a23c', D: '#4a3a20', G: '#8a6a2a',
+    b: '#2e2412', K: '#10101a', H: '#d8b848', M: '#b09030',
+    W: '#e8ecf4', k: '#161620',
+  },
+  magra_alt: {
+    S: '#c08858', P: '#b0b8c0', p: '#9aa2ac', D: '#4a3a20', G: '#8a6a2a',
+    b: '#2e2412', K: '#10101a', H: '#b0b8c0', M: '#888f98',
+    W: '#e8ecf4', k: '#161620',
+  },
+  miraj: {
+    S: '#e8e0d0', P: '#b84a98', p: '#a13f85', D: '#3a2434', G: '#6f6f7a',
+    b: '#281824', K: '#10101a', H: '#b84a98', M: '#8c3673',
+    W: '#ffffff', k: '#161620',
+  },
+  miraj_alt: {
+    S: '#e8e0d0', P: '#4ab8b0', p: '#3fa29a', D: '#243a38', G: '#6f6f7a',
+    b: '#182826', K: '#10101a', H: '#4ab8b0', M: '#368c85',
     W: '#ffffff', k: '#161620',
   },
   gorruk: {

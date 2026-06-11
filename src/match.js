@@ -10,6 +10,7 @@ const STAGES = STAGE_ART;
 const TRAIL_COLORS = {
   iceball: '#7ce0f8', spear: '#b8b8c4', ring: '#48c048',
   venom: '#6cc83a', dart: '#9a7ae8', wave: '#c8a050', fan: '#a8e0e0',
+  gear: '#c89838', hex: '#9ae84a', prism: '#f8d0ec',
 };
 
 class Match {
@@ -78,18 +79,38 @@ class Match {
     SFX.teleport();
   }
 
+  // RIFT SWAP: both fighters trade places in a blink
+  swapFighters(f) {
+    const foe = this.fighters[0] === f ? this.fighters[1] : this.fighters[0];
+    this.particles.spark(f.x, f.y - 24, 0);
+    this.particles.spark(foe.x, foe.y - 24, 0);
+    const fx = f.x;
+    f.x = foe.x;
+    foe.x = fx;
+    f.facing = foe.x >= f.x ? 1 : -1;
+    foe.facing = -f.facing;
+    this.particles.spark(f.x, f.y - 24, 0);
+    this.particles.spark(foe.x, foe.y - 24, 0);
+    SFX.teleport();
+  }
+
   hasProjectile(f) { return this.projectiles.some(p => p.owner === f); }
 
   spawnProjectile(owner, spDef) {
-    if (this.hasProjectile(owner)) return;
-    const p = spDef.proj;
-    this.projectiles.push({
-      owner, def: p,
-      x: owner.x + owner.facing * 16,
-      y: owner.y + p.y,
-      vx: owner.facing * p.speed,
-      t: 0, dead: false,
-    });
+    const list = spDef.projs || (spDef.proj ? [spDef.proj] : []);
+    for (const pd of list) {
+      const live = this.projectiles.filter(p => p.owner === owner).length;
+      if (live >= (pd.volley ? 3 : 1)) continue;
+      const px = owner.x + owner.facing * (pd.place != null ? pd.place : 16);
+      this.projectiles.push({
+        owner, def: pd,
+        x: Math.max(4, Math.min(GAME_W - 4, px)),
+        y: owner.y + pd.y,
+        vx: owner.facing * pd.speed,
+        vy: pd.arc ? pd.arc.vy : 0,
+        t: 0, dead: false, returning: false,
+      });
+    }
   }
 
   update() {
@@ -283,17 +304,54 @@ class Match {
     const hb = att.hitbox();
     if (!hb) return;
     if (!def.isVulnerable()) return;
-    const hurt = def.hurtbox();
-    if (!hurt || !rectsOverlap(hb, hurt)) return;
+    const d = hb.def;
+    const airborne = def.airborne || def.y < FLOOR_Y - 0.5;
+    if (d.quake) {
+      // FAULT LINE: the whole floor is the hitbox; jumping clears it
+      if (airborne) return;
+    } else {
+      const hurt = def.hurtbox();
+      if (!hurt || !rectsOverlap(hb, hurt)) return;
+    }
+    if (d.grab && airborne) return;    // grabs can't catch a foe in the air
 
     att.attack.hasHit = true;
-    const d = hb.def;
     const idx = this.fighters.indexOf(att);
-    const contactX = att.x + att.facing * (d.hitbox.x + d.hitbox.w * 0.7);
-    const contactY = def.y + d.hitbox.y + d.hitbox.h / 2;
+    const contactX = d.quake ? def.x
+      : att.x + att.facing * (d.hitbox.x + d.hitbox.w * 0.7);
+    const contactY = d.quake ? def.y - 8
+      : def.y + d.hitbox.y + d.hitbox.h / 2;
 
-    // block check: lows must be blocked crouching
-    const blocked = def.isBlocking() && !(d.low && !def.isCrouchBlock());
+    // NIGHT REPRISAL: struck mid-stance, the defender blinks behind
+    // the attacker and ripostes
+    if (def.state === 'special' && def.special && def.special.def.counter) {
+      const c = def.special.def.counter;
+      if (def.special.t >= c.from && def.special.t < c.to) {
+        def.special = null;
+        def.state = 'idle';
+        this.teleportFighter(def);
+        const dIdx = 1 - idx;
+        const counterDeciding = this.wins[dIdx] === WINS_NEEDED - 1;
+        att.takeHit(c.dmg, { knockdown: true, attacker: def,
+                             noKO: counterDeciding || this.phase === 'finish' });
+        this.particles.blood(att.x, att.y - 28, def.facing, 10, 1.2);
+        this.addSpark(att.x, att.y - 28, 'hit', true);
+        SFX.heavyHit();
+        this.hitstop = HITSTOP_HEAVY;
+        this.shake = 6;
+        this.combo[dIdx].n = 1;
+        if (att.hp <= 0) {
+          if (counterDeciding) this.enterFinish(dIdx, att);
+          else this.checkKO();
+        }
+        return;
+      }
+    }
+
+    // block check: lows must be blocked crouching; grabs and quakes
+    // go straight through a guard
+    const blocked = !d.grab && !d.quake &&
+      def.isBlocking() && !(d.low && !def.isCrouchBlock());
     if (blocked) {
       def.takeBlock(0, d.blockstun, d.kb);
       this.cornerPush(att, def, d.kb);
@@ -315,6 +373,18 @@ class Match {
     if (def.state === 'frozen') { dmg = Math.round(dmg * FROZEN_BONUS); shatter = true; }
     if (def.state === 'juggle' || (def.airborne && def.state !== 'jump' && def.state !== 'airattack')) {
       dmg = Math.max(1, Math.round(dmg * JUGGLE_SCALE));
+    }
+
+    // GRANITE RAM: an armored charge shrugs off one hit at half damage
+    if (def.state === 'attack' && def.attack && def.attack.def.armor &&
+        !def.attack.armored && def.hp > dmg) {
+      def.attack.armored = true;
+      def.hp = Math.max(1, def.hp - Math.ceil(dmg / 2));
+      def.flash = 4;
+      this.addSpark(contactX, contactY, 'block', true);
+      SFX.block();
+      this.hitstop = 3;
+      return;
     }
 
     // combo bookkeeping
@@ -346,6 +416,11 @@ class Match {
       launch: d.launch, knockdown: d.knockdown,
       attacker: att, noKO,
     });
+    if (d.drain) {           // LEECHING LASH: bite back the damage dealt
+      att.hp = Math.min(MAX_HP, att.hp + Math.round(dmg * d.drain));
+      this.particles.trail(att.x, att.y - 30, '#6cc83a');
+    }
+    if (d.quake) this.shake = 12;
     this.cornerPush(att, def, d.kb);
 
     this.particles.blood(contactX, contactY, att.facing, d.heavy ? 14 : 7, d.heavy ? 1.4 : 1);
@@ -373,17 +448,62 @@ class Match {
   updateProjectiles() {
     for (const p of this.projectiles) {
       p.t++;
+      // hex lobs arc under gravity and shatter on the ground
+      if (p.def.arc) {
+        p.y += p.vy;
+        p.vy += p.def.arc.g;
+      }
+      // gear boomerangs whirl back toward their owner's hand
+      if (p.def.boomerang) {
+        if (!p.returning &&
+            (p.t >= p.def.boomerang || p.x < 12 || p.x > GAME_W - 12)) {
+          p.returning = true;
+        }
+        if (p.returning) {
+          p.vx = Math.sign(p.owner.x - p.x || 1) * Math.abs(p.def.speed);
+          if (Math.abs(p.x - p.owner.x) < 8) { p.dead = true; continue; }   // caught
+        }
+      }
       p.x += p.vx;
-      if (p.t % 2 === 0) {        // fading energy trail
+      if (p.def.arc && p.y >= FLOOR_Y - 2) {
+        p.dead = true;
+        this.particles.spark(p.x, FLOOR_Y - 4, 0);
+        continue;
+      }
+      if (p.t % 2 === 0 && p.vx) {        // fading energy trail (not for mines)
         this.particles.trail(p.x - p.vx * 2, p.y + 4, TRAIL_COLORS[p.def.kind] || '#888');
       }
-      if (p.x < -20 || p.x > GAME_W + 20) { p.dead = true; continue; }
+      if (!p.def.mine && !p.def.boomerang &&
+          (p.x < -20 || p.x > GAME_W + 20)) { p.dead = true; continue; }
+      // bog snares arm, lie in wait, then fizzle out
+      if (p.def.mine) {
+        if (p.t > p.def.mine.life) {
+          p.dead = true;
+          this.particles.spark(p.x, p.y, 0);
+          continue;
+        }
+        if (p.t < p.def.mine.arm) continue;
+      }
 
       const def = this.fighters[0] === p.owner ? this.fighters[1] : this.fighters[0];
       if (!def.isVulnerable()) continue;
       const hurt = def.hurtbox();
       if (!hurt) continue;
       const box = { x: p.x - 5, y: p.y - 4, w: 10, h: 8 };
+
+      // STEAM GEYSER: an active reflecting attack turns the shot around
+      const rb = def.hitbox();
+      if (rb && rb.def.reflect && rectsOverlap(box, rb)) {
+        p.owner = def;
+        p.vx = def.facing * Math.abs(p.def.speed || 2);
+        p.t = 0;
+        p.returning = false;
+        this.particles.spark(p.x, p.y, 0);
+        this.addSpark(p.x, p.y, 'block', false);
+        SFX.block();
+        continue;
+      }
+
       if (!rectsOverlap(box, hurt)) continue;
 
       p.dead = true;
@@ -391,7 +511,9 @@ class Match {
       const deciding = this.wins[ownerIdx] === WINS_NEEDED - 1;
       const noKO = deciding || this.phase === 'finish';
 
-      if (def.isBlocking()) {
+      // lows (ground waves, bog snares) must be blocked crouching
+      const projBlocked = def.isBlocking() && !(p.def.low && !def.isCrouchBlock());
+      if (projBlocked) {
         def.takeBlock(p.def.chip, 14, 1.6);
         this.particles.spark(p.x, p.y, -def.facing);
         this.addSpark(p.x, p.y, 'block', false);
@@ -418,9 +540,15 @@ class Match {
         this.comboTag(p.owner, def);
         if (def.hp <= 0 && !this.afterProjKill(ownerIdx, def, deciding)) continue;
       } else {
-        // plain damage projectile (STRIKER's pulse ring)
+        // plain damage projectile; may knock down, launch, or poison
         def.takeHit(Math.round(p.def.dmg * p.owner.dmgMul),
-          { hitstun: p.def.hitstun || 18, kb: p.def.kb || 2, attacker: p.owner, noKO });
+          { hitstun: p.def.hitstun || 18, kb: p.def.kb || 2,
+            knockdown: p.def.knockdown, launch: p.def.launch,
+            attacker: p.owner, noKO });
+        if (p.def.poison) {
+          def.poisoned = { n: p.def.poison.ticks, dmg: p.def.poison.dmg,
+                           every: p.def.poison.every, t: p.def.poison.every };
+        }
         SFX.hit();
         this.particles.blood(def.x, def.y - 28, Math.sign(p.vx) || 1, 8, 1);
         this.comboTag(p.owner, def);
@@ -432,7 +560,8 @@ class Match {
     for (let i = 0; i < this.projectiles.length; i++) {
       for (let j = i + 1; j < this.projectiles.length; j++) {
         const a = this.projectiles[i], b = this.projectiles[j];
-        if (!a.dead && !b.dead && Math.abs(a.x - b.x) < 10 && Math.abs(a.y - b.y) < 10) {
+        if (!a.dead && !b.dead && a.owner !== b.owner &&
+            Math.abs(a.x - b.x) < 10 && Math.abs(a.y - b.y) < 10) {
           a.dead = b.dead = true;
           this.particles.spark((a.x + b.x) / 2, a.y, 0);
           SFX.block();
