@@ -17,8 +17,8 @@ Yie Ar Kung-Fu (1985). Vanilla JS + HTML5 canvas, no frameworks, no build step.
 
 | Fighter | Style | Specials |
 |---|---|---|
-| KIRO | ice ninja | Down, Forward + Low Punch — Ice Blast (freeze; next hit shatters for bonus) |
-| ASHKAR | fire ninja | Back, Forward + Low Punch — Flame Spear (pulls the opponent in, stun) |
+| KIRO | ice ninja | Down, Forward + Low Punch — Ice Blast (freeze; next hit shatters for bonus)  /  Back, Forward + Low Kick — Ice Slide (low dash, knocks down) |
+| ASHKAR | fire ninja | Back, Forward + Low Punch — Flame Spear (pulls the opponent in, stun)  /  Down, Back + High Punch — Phantom Strike (vanishes, strikes from behind) |
 | VOLTAN | thunder god | Back, Forward + High Punch — Storm Torpedo (dash)  /  Down, Back + Low Punch — Thunder Step (teleport behind) |
 | STRIKER | soldier | Down, Forward + Low Punch — Pulse Ring  /  Down, Back + Low Kick — Scissor Takedown |
 | GORRUK | boss, AI only | Crusher, Quake Slam, Rampage lunge — 1.35x damage, can't be launched |
@@ -57,7 +57,7 @@ hurtboxes (green), pushboxes (blue), state + frame data.
 | `src/characters.js` | frame data, hit/hurt/push boxes, roster + boss defs |
 | `src/ai.js` | CPU opponents (reaction-delayed, 4 presets incl. boss) |
 | `src/art.js` | all sprites as pixel strings (ninja set + boss set + portraits + 3 stage backdrops) |
-| `src/sprites.js` | bake pipeline: EPX 2x upscale + top-lit auto-shading, then offscreen canvases |
+| `src/sprites.js` | bake pipeline: flat 2x for fighters, EPX + auto-shading for stages/effects |
 | `src/audio.js` | Web Audio synth: hits, whiffs, announcer voice, jingles |
 | `src/particles.js` | blood / sparks / ice shards |
 | `src/font.js` | 3x5 pixel font |
@@ -68,16 +68,19 @@ hurtboxes (green), pushboxes (blue), state + frame data.
 - `node test/smoke.js` — headless engine test (stubs the DOM; exercises every
   special, blocking, FINISH THEM/finisher, boss match, AI vs AI, input fuzz).
 - `node test/render_sheet.js` — renders every sprite frame (through the real
-  EPX + shading pipeline) to `test/art_preview.png` and the stage backdrops to
+  bake pipeline) to `test/art_preview.png` and the stage backdrops to
   `test/art_stages.png`.
 
 ## Graphics pipeline
 
-Sprites are authored as chunky character grids and refined at bake time:
-EPX/Scale2x doubles the resolution (rounding staircase diagonals), then a
-top-lit auto-shading pass adds highlight/shadow ramps per palette color
-(~18 effective tones per fighter). Fighters animate with 4-frame walks,
-3-frame breathing idles, and followthrough frames on attacks. Stages are
-full-screen pixel-art backdrops (80x50 grids, same pipeline) with animated
-decorations: brazier flames, lantern glows, twinkling stars. Hits and blocks
-flash sprite-based sparks; projectiles leave fading trails.
+Sprites are authored as chunky character grids. Fighters, portraits, and
+projectiles bake flat — one art pixel becomes a solid 2x2 block in flat
+palette colors — for the original Yie Ar Kung-Fu look. Fighters still animate
+with 4-frame walks, 3-frame breathing idles, and followthrough frames on
+attacks. Stages and effects get a refinement pass instead: EPX/Scale2x
+doubles the resolution (rounding staircase diagonals), then top-lit
+auto-shading adds highlight/shadow ramps. Seven stages are full-screen
+pixel-art backdrops (80x50 grids) with animated decorations: brazier flames,
+lantern glows, fireflies, lightning, twinkling stars. The Warlord's Pit is
+reserved for the boss fight. Hits and blocks flash sprite-based sparks;
+projectiles leave fading trails.

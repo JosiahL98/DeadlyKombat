@@ -9,9 +9,9 @@ class Fighter {
     this.char = CHARACTERS[charId];
     this.side = side;                  // 0 = left start, 1 = right start
     const frames = this.char.frameSet === 'gorruk' ? GORRUK_FRAMES : NINJA_FRAMES;
-    this.sheet = bakeSheet(frames, PALETTES[paletteKey]);
-    this.iceSheet = bakeSheet(frames, PALETTES.ice);
-    this.flashSheet = bakeSheet(frames, PALETTES.flash, { noShade: true });
+    this.sheet = bakeSheet(frames, PALETTES[paletteKey], { flat: true });
+    this.iceSheet = bakeSheet(frames, PALETTES.ice, { flat: true });
+    this.flashSheet = bakeSheet(frames, PALETTES.ice, { mono: '#ffffff', flat: true });
     // characters with their own frame set alias the poses they lack
     for (const sheet of [this.sheet, this.iceSheet, this.flashSheet]) {
       for (const key in NINJA_FRAMES) {
@@ -211,6 +211,9 @@ class Fighter {
       case 'attack': {
         const atk = this.attack;
         atk.t++;
+        if (atk.def.teleportAt && atk.t === atk.def.teleportAt) {
+          match.teleportFighter(this);     // phantom strike: blink behind them
+        }
         if (atk.t === atk.def.startup) SFX.whiff();
         const dd = atk.def.dash;
         if (dd && atk.t >= dd.from && atk.t < dd.to && !atk.hasHit) {
@@ -469,10 +472,12 @@ class Fighter {
   }
 
   draw(g) {
-    // vanished mid-teleport
-    if (this.state === 'special' && this.special && this.special.def.vanish) {
-      const [v0, v1] = this.special.def.vanish;
-      if (this.special.t >= v0 && this.special.t < v1) return;
+    // vanished mid-teleport (teleport specials and the phantom strike)
+    const act = this.state === 'special' ? this.special
+              : this.state === 'attack' ? this.attack : null;
+    if (act && act.def.vanish) {
+      const [v0, v1] = act.def.vanish;
+      if (act.t >= v0 && act.t < v1) return;
     }
     const key = this.spriteKey();
     let sheet = this.sheet;

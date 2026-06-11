@@ -322,9 +322,10 @@ const scenarioCode = `
     assert(CHARACTERS[id], 'roster character missing: ' + id);
   }
 
-  // 15. every sprite key referenced by states/attacks exists in the ninja art
-  const needed = new Set(['idle_a','idle_b','walk_a','walk_b','jump','crouch','block',
-    'block_crouch','hit','juggle','down','win','jump_kick','dazed']);
+  // 15. every sprite key referenced by states/attacks exists in the body rig
+  const needed = new Set(['idle_a','idle_b','idle_c','walk_a','walk_b','walk_c','walk_d',
+    'jump','crouch','block','block_crouch','hit','juggle','down','win','win_b',
+    'jump_kick','dazed']);
   for (const k in ATTACKS) {
     if (k.startsWith('g_')) continue;          // boss anims use the boss sheet
     for (const [spr] of ATTACKS[k].anim) needed.add(spr);
@@ -370,8 +371,35 @@ const scenarioCode = `
     }
   }
 
+  // 16c. new ninja specials: KIRO's slide travels and knocks down;
+  // ASHKAR's phantom strike teleports behind the foe and connects
+  m = new Match({ p1: 'kiro', p2: 'ashkar', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  globalThis.readPad = () => neutralPad();
+  m.fighters[0].x = 100; m.fighters[1].x = 190;
+  m.fighters[0].startAttack('slide');
+  let slid = false;
+  for (let i = 0; i < 100; i++) {
+    m.update();
+    if (['juggle', 'down'].includes(m.fighters[1].state)) slid = true;
+  }
+  assert(slid, 'ice slide did not knock down (foe ' + m.fighters[1].state + ')');
+  assert(m.fighters[0].x > 110, 'ice slide did not travel (x=' + m.fighters[0].x + ')');
+
+  m = new Match({ p1: 'ashkar', p2: 'kiro', mode: 'vs' });
+  m.phase = 'fight'; m.banner = null;
+  m.fighters[0].x = 80; m.fighters[1].x = 200;
+  m.fighters[0].startAttack('phantom');
+  let phantomHit = false;
+  for (let i = 0; i < 80; i++) {
+    m.update();
+    if (['juggle', 'down', 'hitstun'].includes(m.fighters[1].state)) phantomHit = true;
+  }
+  assert(m.fighters[0].x > m.fighters[1].x, 'phantom strike did not cross behind the foe');
+  assert(phantomHit, 'phantom strike did not connect');
+
   // 17. stage art sanity: 80x50 grids, every char resolvable in the palette
-  assert(STAGE_ART.length === 3, 'expected 3 stages, got ' + STAGE_ART.length);
+  assert(STAGE_ART.length === 7, 'expected 7 stages, got ' + STAGE_ART.length);
   for (const st of STAGE_ART) {
     assert(st.rows.length === 50, 'stage ' + st.name + ' has ' + st.rows.length + ' rows');
     for (const row of st.rows) {

@@ -1,10 +1,11 @@
 'use strict';
-// Sprite baking pipeline. Frames are authored as chunky pixel strings (art.js)
-// and refined at bake time:
-//   1. EPX/Scale2x upscale - doubles resolution, rounding staircase diagonals
-//   2. top-lit auto-shading - silhouette top edges get a highlight ramp,
-//      bottom edges a shadow ramp (so each palette color yields 3 tones)
-// One authored art pixel therefore becomes a 2x2 cell of shaded detail.
+// Sprite baking pipeline. Frames are authored as chunky pixel strings (art.js).
+// Two bake styles:
+//   flat (fighters, projectiles) - one art pixel = a solid 2x2 block, flat
+//     palette colors: the original Yie-Ar-Kung-Fu chunky look.
+//   refined (stages, effects) - EPX/Scale2x upscale (doubles resolution,
+//     rounding staircase diagonals) then top-lit auto-shading (silhouette top
+//     edges get a highlight ramp, bottom edges a shadow ramp).
 
 function frameGrid(frame) {
   const rows = frame.r;
@@ -49,11 +50,26 @@ function shadeColor(hex, f) {
   return 'rgb(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ')';
 }
 
+// each cell becomes a 2x2 block of itself: chunky upscale, no smoothing
+function block2x(grid) {
+  const out = [];
+  for (const row of grid) {
+    const r2 = [];
+    for (const c of row) r2.push(c, c);
+    out.push(r2, r2.slice());
+  }
+  return out;
+}
+
 // pure renderer: frame + palette -> 2D array of CSS colors (null = clear).
 // Shared by the in-game bake and the node-side preview tool.
+// opts.flat = chunky block upscale + flat colors (no EPX, no shading).
+// frame.hi = true means the art is authored at native resolution: no
+// upscale at all, one art pixel = one screen pixel.
 function renderFrameGrid(frame, palette, opts) {
   opts = opts || {};
-  const g2 = epx(frameGrid(frame));
+  const g1 = frameGrid(frame);
+  const g2 = frame.hi ? g1 : opts.flat ? block2x(g1) : epx(g1);
   const h = g2.length, w = h ? g2[0].length : 0;
   const ramps = {};
   for (const ch in palette) {
@@ -69,8 +85,9 @@ function renderFrameGrid(frame, palette, opts) {
     for (let x = 0; x < w; x++) {
       const ch = g2[y][x];
       if (!ch) { row.push(null); continue; }
+      if (opts.mono) { row.push(opts.mono); continue; }     // hit-flash silhouette
       const ramp = ramps[ch] || { base: '#ff00ff', light: '#ff00ff', dark: '#ff00ff' };
-      if (opts.noShade) { row.push(ramp.base); continue; }
+      if (opts.noShade || opts.flat) { row.push(ramp.base); continue; }
       const above = y > 0 ? g2[y - 1][x] : null;
       const below = y < h - 1 ? g2[y + 1][x] : null;
       if (!above) row.push(ramp.light);        // top rim catches the light
@@ -96,8 +113,41 @@ function bakeFrame(frame, palette, opts) {
       g.fillRect(x, y, 1, 1);
     }
   }
-  // EPX doubled the grid, so the anchor doubles with it
-  return { cv, w: cv.width, h: cv.height, ax: frame.a * 2 };
+  // EPX doubles the grid (and the anchor); native-res frames map 1:1
+  return { cv, w: cv.width, h: cv.height, ax: frame.a * (frame.hi ? 1 : 2) };
+}
+
+// Overlay a character head onto a headless body frame. body.hd = [x, y] is
+// where the head's bottom-center anchor lands in body grid coordinates.
+function compositeFrame(body, head) {
+  let hw = 0;
+  for (const r of head.r) hw = Math.max(hw, r.length);
+  const hh = head.r.length;
+  let hx = body.hd[0] - (hw >> 1);
+  let hy = body.hd[1] - hh;
+  let rows = body.r.slice();
+  let a = body.a;
+  if (hx < 0) {                       // wide headgear (a hat brim) overhangs left
+    const pad = '.'.repeat(-hx);
+    rows = rows.map(r => pad + r);
+    a += -hx;
+    hx = 0;
+  }
+  if (hy < 0) {                       // head extends above the body grid
+    rows = new Array(-hy).fill('').concat(rows);
+    hy = 0;
+  }
+  const out = rows.map(r => r.split(''));
+  head.r.forEach((hr, y) => {
+    for (let x = 0; x < hr.length; x++) {
+      const ch = hr[x];
+      if (!ch || ch === '.' || ch === ' ') continue;
+      const row = out[hy + y];
+      while (row.length <= hx + x) row.push('.');
+      row[hx + x] = ch;
+    }
+  });
+  return { a, hi: true, r: out.map(r => r.join('')) };
 }
 
 function bakeSheet(frames, palette, opts) {

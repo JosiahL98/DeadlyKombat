@@ -22,7 +22,7 @@ class Match {
     this.ai = this.mode === 'cpu' ? new AI(opts.aiLevel == null ? 1 : opts.aiLevel) : null;
     this.particles = new ParticleSystem();
     this.projectiles = [];
-    this.projSheets = bakeSheet(PROJ_FRAMES, PROJ_PALETTE);
+    this.projSheets = bakeSheet(PROJ_FRAMES, PROJ_PALETTE, { flat: true });
     this.wins = [0, 0];
     this.round = 1;
     this.combo = [{ n: 0, show: 0 }, { n: 0, show: 0 }];

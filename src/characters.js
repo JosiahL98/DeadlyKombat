@@ -87,6 +87,24 @@ const ATTACKS = {
     dash: { vx: 5, from: 4, to: 22 },
     knockdown: true, heavy: true,
   },
+  slide: {
+    name: 'ICE SLIDE',
+    anim: [['crouch', 4], ['crouch_kick', 18], ['crouch', 6]],
+    startup: 4, active: 16,
+    dmg: 8, hitstun: 0, blockstun: 12, kb: 2.0,
+    hitbox: { x: 2, y: -14, w: 24, h: 14 },
+    dash: { vx: 4.2, from: 4, to: 20 },
+    low: true, knockdown: true, heavy: true,
+  },
+  phantom: {
+    name: 'PHANTOM STRIKE',
+    anim: [['punch_wind', 8], ['hpunch', 5], ['punch_follow', 4], ['punch_wind', 4]],
+    startup: 9, active: 4,
+    teleportAt: 8, vanish: [2, 8],     // disappears, reappears behind the foe
+    dmg: 10, hitstun: 0, blockstun: 10, kb: 2.4,
+    hitbox: { x: 0, y: -42, w: 26, h: 16 },
+    knockdown: true, heavy: true,
+  },
   leggrab: {
     name: 'LEG GRAB',
     anim: [['crouch', 5], ['sweep', 8], ['crouch', 9]],
@@ -132,35 +150,51 @@ const CHARACTERS = {
     id: 'kiro', name: 'KIRO',
     tagline: 'THE COLD WIND',
     palette: 'kiro', altPalette: 'kiro_alt',
-    specials: [{
-      id: 'iceblast', name: 'ICE BLAST',
-      seq: ['D', 'F'], btn: 'lp',
-      anim: [['throw_proj', 10], ['throw_proj', 16]],
-      spawnFrame: 8,
-      proj: {
-        kind: 'iceball', speed: 2.4, dmg: 0, chip: 2,
-        y: -30, frames: ['iceball_a', 'iceball_b'],
-        freeze: 100,
+    specials: [
+      {
+        id: 'iceblast', name: 'ICE BLAST',
+        seq: ['D', 'F'], btn: 'lp',
+        anim: [['throw_proj', 10], ['throw_proj', 16]],
+        spawnFrame: 8,
+        proj: {
+          kind: 'iceball', speed: 2.4, dmg: 0, chip: 2,
+          y: -30, frames: ['iceball_a', 'iceball_b'],
+          freeze: 100,
+        },
       },
-    }],
-    moveHint: ['DOWN, FORWARD + LOW PUNCH = ICE BLAST'],
+      {
+        id: 'slide', name: 'ICE SLIDE',
+        seq: ['B', 'F'], btn: 'lk',
+        type: 'attack', attack: 'slide',
+      },
+    ],
+    moveHint: ['DOWN, FORWARD + LOW PUNCH = ICE BLAST',
+               'BACK, FORWARD + LOW KICK = ICE SLIDE'],
   },
   ashkar: {
     id: 'ashkar', name: 'ASHKAR',
     tagline: 'THE BURNING SPEAR',
     palette: 'ashkar', altPalette: 'ashkar_alt',
-    specials: [{
-      id: 'spear', name: 'FLAME SPEAR',
-      seq: ['B', 'F'], btn: 'lp',
-      anim: [['throw_proj', 10], ['throw_proj', 20]],
-      spawnFrame: 8,
-      proj: {
-        kind: 'spear', speed: 3.2, dmg: 6, chip: 2,
-        y: -30, frames: ['spear'],
-        pull: true, rope: true,
+    specials: [
+      {
+        id: 'spear', name: 'FLAME SPEAR',
+        seq: ['B', 'F'], btn: 'lp',
+        anim: [['throw_proj', 10], ['throw_proj', 20]],
+        spawnFrame: 8,
+        proj: {
+          kind: 'spear', speed: 3.2, dmg: 6, chip: 2,
+          y: -30, frames: ['spear'],
+          pull: true, rope: true,
+        },
       },
-    }],
-    moveHint: ['BACK, FORWARD + LOW PUNCH = FLAME SPEAR'],
+      {
+        id: 'phantom', name: 'PHANTOM STRIKE',
+        seq: ['D', 'B'], btn: 'hp',
+        type: 'attack', attack: 'phantom',
+      },
+    ],
+    moveHint: ['BACK, FORWARD + LOW PUNCH = FLAME SPEAR',
+               'DOWN, BACK + HIGH PUNCH = PHANTOM STRIKE'],
   },
   voltan: {
     id: 'voltan', name: 'VOLTAN',

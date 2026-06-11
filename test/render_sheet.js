@@ -75,24 +75,27 @@ function writePNG(img, file) {
 // ---- frame sheet (through the real pipeline; each rendered cell = 2px) ----
 const CELL = 2;
 const CELL_W = 30 * 2 * CELL, CELL_H = 34 * 2 * CELL;
-const ninjaPal = Object.assign({}, ctx.PALETTES.kiro, ctx.PROJ_PALETTE);
-const entries = Object.entries(ctx.NINJA_FRAMES).map(([n, f]) => [n, f, ninjaPal])
-  .concat(Object.entries(ctx.GORRUK_FRAMES).map(([n, f]) => ['g_' + n, f, ctx.PALETTES.gorruk]))
-  .concat(Object.entries(ctx.PORTRAIT_ART).map(([n, p]) =>
-    ['por_' + n, p.frame, p.palette]))
-  .concat(Object.entries(ctx.PROJ_FRAMES).map(([n, f]) => [n, f, ctx.PROJ_PALETTE]))
-  .concat(Object.entries(ctx.SPARK_FRAMES).map(([n, f]) => [n, f, ctx.SPARK_HIT_PALETTE]))
-  .concat(Object.entries(ctx.FLAME_FRAMES).map(([n, f]) => ['flame_' + n, f, ctx.FLAME_PALETTE]));
-const cols = 6, rows = Math.ceil(entries.length / cols);
+const entries = [];
+// fighters / projectiles / portraits bake flat in-game; effects keep EPX
+const FLAT = { flat: true };
+for (const [n, f] of Object.entries(ctx.NINJA_FRAMES)) entries.push([n, f, ctx.PALETTES.kiro, FLAT]);
+for (const [n, f] of Object.entries(ctx.GORRUK_FRAMES)) entries.push(['g_' + n, f, ctx.PALETTES.gorruk, FLAT]);
+for (const [n, p] of Object.entries(ctx.PORTRAIT_ART)) entries.push(['por_' + n, p.frame, p.palette, FLAT]);
+for (const [n, f] of Object.entries(ctx.PROJ_FRAMES)) entries.push([n, f, ctx.PROJ_PALETTE, FLAT]);
+for (const [n, f] of Object.entries(ctx.SPARK_FRAMES)) entries.push([n, f, ctx.SPARK_HIT_PALETTE]);
+for (const [n, f] of Object.entries(ctx.FLAME_FRAMES)) entries.push(['flame_' + n, f, ctx.FLAME_PALETTE]);
+
+const cols = 8, rows = Math.ceil(entries.length / cols);
 const img = makeImg(cols * CELL_W, rows * (CELL_H + 10), cssToRgb('#141021'));
 
-entries.forEach(([name, frame, pal], i) => {
+entries.forEach(([name, frame, pal, opts], i) => {
   const cx = (i % cols) * CELL_W;
   const cy = (i / cols | 0) * (CELL_H + 10);
   const baseline = cy + CELL_H - 8;
   rect(img, cx, baseline, CELL_W, 1, cssToRgb('#3f3a4e'));
-  const r = ctx.renderFrameGrid(frame, pal);
-  const ox = cx + (CELL_W >> 1) - frame.a * 2 * CELL, oy = baseline - r.h * CELL;
+  const r = ctx.renderFrameGrid(frame, pal, opts);
+  const ax = frame.a * (frame.hi ? 1 : 2);
+  const ox = cx + (CELL_W >> 1) - ax * CELL, oy = baseline - r.h * CELL;
   for (let y = 0; y < r.h; y++) {
     for (let x = 0; x < r.w; x++) {
       const c = r.grid[y][x];

@@ -1029,169 +1029,84 @@ const GORRUK_FRAMES = {
 };
 
 // ---- portraits (select + ladder screens) ----
-// Authored at 20x22 (EPX bakes them to 40x44, drawn 1:1 in the select cells).
-// Each fighter gets a dedicated palette and battle damage of their own:
-// keyed by character id.
+// The original 10x10 set: EPX bakes them to 20x20, drawn at 2x in the cells.
 const PORTRAIT_ART = {
-
-  // KIRO: blue hood and mask, an old scar splitting his left brow and eye
   kiro: {
-    palette: {
-      H: '#3e6fa8', D: '#1c2433', M: '#2c4f78', S: '#d6a273',
-      k: '#161620', W: '#e8ecf4', r: '#9a5a48',
-    },
+    palette: { P: '#3e6fa8', S: '#d6a273', K: '#10101a', D: '#23232e' },
     frame: { a: 0, r: [
-      '......HHHHHHHH',
-      '....HHHHHHHHHHHH',
-      '...HHHHHHHHHHHHHH',
-      '..HHHHHHHHHHHHHHHH',
-      '..HHHHHHHHHHHHHHHH',
-      '..HHHDDDDDDDDDDHHH',
-      '..HHDSSSSSSSSSSDHH',
-      '..HHDSSrSSSSSSSDHH',
-      '..HHDkkrSSSkkkSDHH',
-      '..HHDWkrSSSWWkSDHH',
-      '..HHDSSrSSSSSSSDHH',
-      '..HHDMMMMMMMMMMDHH',
-      '..HHMMMMMMMMMMMMHH',
-      '..HHMMMMMMMMMMMMHH',
-      '...HHMMMMMMMMMMHH',
-      '....HHMMMMMMMMHH',
-      '.....HHMMMMMMHH',
-      '......DDMMMMDD',
-      '....DDDDDDDDDDDD',
-      '..DDDDDDDDDDDDDDDD',
-      '.DDDDDHHHHHHHHDDDDD',
-      '.DDDDDHHHHHHHHDDDDD',
+      '..PPPPPP..',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PSSSSSSP.',
+      '.PSKSSKSP.',
+      '.PSSSSSSP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.DDPPPPDD.',
+      '.DDDDDDDD.',
     ]},
   },
-
-  // ASHKAR: gold hood, bandage-wrapped mask, burn scarring up the right side
   ashkar: {
-    palette: {
-      H: '#c07a1e', D: '#33231a', M: '#8a5414', m: '#a3661a',
-      S: '#d6a273', k: '#161620', W: '#e8ecf4', r: '#8a3a2a',
-    },
+    palette: { P: '#c07a1e', S: '#d6a273', K: '#10101a', D: '#2e2326' },
     frame: { a: 0, r: [
-      '......HHHHHHHH',
-      '....HHHHHHHHHHHH',
-      '...HHHHHHHHHHHHHH',
-      '..HHHHHHHHHHHHHHHH',
-      '..HHHHHHHHHHHHHHHH',
-      '..HHHDDDDDDDDDDHHH',
-      '..HHDSSSSSSSrrSDHH',
-      '..HHDSSSSSSSSrrDHH',
-      '..HHDkkkSSSSkkrDHH',
-      '..HHDWWkSSSSWkrDHH',
-      '..HHDSSSSSSSrrSDHH',
-      '..HHDMMMMMMMMMMDHH',
-      '..HHmmmmmmmmmmmmHH',
-      '..HHMMMMMMMMMMMMHH',
-      '...HHmmmmmmmmmmHH',
-      '....HHMMMMMMMMHH',
-      '.....HHmmmmmmHH',
-      '......DDMMMMDD',
-      '....DDDDDDDDDDDD',
-      '..DDDDDDDDDDDDDDDD',
-      '.DDDDDHHHHHHHHDDDDD',
-      '.DDDDDHHHHHHHHDDDDD',
+      '..PPPPPP..',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.PSSSSSSP.',
+      '.PSKSSKSP.',
+      '.PSSSSSSP.',
+      '.PPPPPPPP.',
+      '.PPPPPPPP.',
+      '.DDPPPPDD.',
+      '.DDDDDDDD.',
     ]},
   },
-
-  // VOLTAN: straw hat shadowing the face, eyes burning white, storm-gray beard
+  // thunder god: wide hat brim, glowing white eyes
   voltan: {
-    palette: {
-      T: '#a89858', D: '#23283c', d: '#8a6a4e', S: '#d6a273',
-      W: '#ffffff', B: '#d8d8e0', R: '#c8c8d8', k: '#161620',
-    },
+    palette: { P: '#c8c8d8', S: '#d6a273', W: '#ffffff', D: '#28283a' },
     frame: { a: 0, r: [
-      '.........TT',
-      '.......TTTTTT',
-      '.....TTTTTTTTTT',
-      '..TTTTTTTTTTTTTTTT',
-      '.TTTTTTTTTTTTTTTTTT',
-      '...DDDDDDDDDDDDDD',
-      '...DddddddddddddD',
-      '...DddWWddddWWddD',
-      '...DSSSSSSSSSSSSD',
-      '...DSSSSSSSSSSSSD',
-      '...DSBBBBBBBBBBSD',
-      '...DBBBBBBBBBBBBD',
-      '...DBBBBBBBBBBBBD',
-      '....DBBBBBBBBBBD',
-      '.....DBBBBBBBBD',
-      '......DBBBBBBD',
-      '.......DBBBBD',
-      '......DDDDDDDD',
-      '....RRRRRRRRRRRR',
-      '..RRRRRRRRRRRRRRRR',
-      '.RRRRRDDDDDDDDRRRRR',
-      '.RRRRRDDDDDDDDRRRRR',
+      '....PP....',
+      '..PPPPPP..',
+      'PPPPPPPPPP',
+      '..SSSSSS..',
+      '..SWSSWS..',
+      '..SSSSSS..',
+      '..SSSSSS..',
+      '..DDDDDD..',
+      '.DDDDDDDD.',
+      '.DDDDDDDD.',
     ]},
   },
-
-  // STRIKER: buzz cut, field headband, stubble, cheek scar, dog tags
+  // soldier: buzz cut + headband
   striker: {
-    palette: {
-      K: '#262620', B: '#4a7a3a', S: '#d6a273', d: '#a3794f',
-      k: '#161620', W: '#e8ecf4', r: '#8a4a3a', C: '#3a5230',
-      c: '#55663a', T: '#c0c0c8',
-    },
+    palette: { K: '#10101a', P: '#4a7a3a', S: '#d6a273', D: '#2a2a22' },
     frame: { a: 0, r: [
-      '.....KKKKKKKKKK',
-      '....KKKKKKKKKKKK',
-      '...KKKKKKKKKKKKKK',
-      '...BBBBBBBBBBBBBB',
-      '...BBBBBBBBBBBBBB',
-      '...SSSSSSSSSSSSSS',
-      '...SSkkkSSSSkkkSS',
-      '...SSWWkSSSSWWkSS',
-      '...SSrSSSSSSSSSSS',
-      '...CCCCCCCCCCCCCC',
-      '...CCccCCCCccCCCC',
-      '...CCCCCCcCCCCCCC',
-      '...CCccCCCCCCccCC',
-      '....CCCCCCccCCCC',
-      '.....CCccCCCCCC',
-      '......CCCCCCCC',
-      '.......SSTTSS',
-      '..CCCCCCCTTCCCCCCC',
-      '..CCccCCCCTCCccCCC',
-      '.CCCCCCCccCCCCCCCC',
-      '.CCccCCCCCCCCccCCC',
-      '.CCCCCCcCCCCCCCCCC',
+      '..KKKKKK..',
+      '.KKKKKKKK.',
+      '.PPPPPPPP.',
+      '.SSSSSSSS.',
+      '.SKSSSSKS.',
+      '.SSSSSSSS.',
+      '.SSSSSSSS.',
+      '.SSDDDDSS.',
+      '.DDDDDDDD.',
+      '.DDDDDDDD.',
     ]},
   },
-
-  // GORRUK: a wall of scarred muscle -- brow ridge, red eyes, war paint, tusks
+  // the boss: heavy brow, tusks
   gorruk: {
-    palette: {
-      S: '#b87848', P: '#7a2424', k: '#241208', E: '#d83030',
-      W: '#e8e0c8', A: '#4a3018', G: '#c8a030',
-    },
+    palette: { S: '#b87848', K: '#140e0e', W: '#e8e8f0', P: '#7a2424' },
     frame: { a: 0, r: [
-      '..SSSSSSSSSSSSSSSS',
-      '.SSSSSSSSSSSSSSSSSS',
-      '.SSSSSSSSSSSSSSSSSS',
-      '.SSPPSSSSSSSSSSPPSS',
-      '.SSPPSSSSSSSSSSPPSS',
-      '.SkkkkSSSSSSSSkkkkS',
-      '.SSkEESSSSSSSSEEkSS',
-      '.SSSSSSSkkSSSSSSSSS',
-      '.SSSSSSSkkSSSSSSSSS',
-      '.SSWSSSSSSSSSSSSWSS',
-      '.SSWWkkkkkkkkkkWWSS',
-      '.SSWWSSSSSSSSSSWWSS',
-      '..SSSSSSSSSSSSSSSS',
-      '..SSSSSSSSSSSSSSSS',
-      '...SSSSSSSSSSSSSS',
-      '....SSSSSSSSSSSS',
-      '..AAAAAAAAAAAAAAAA',
-      '.AAAAGGAAAAAAGGAAAA',
-      '.AAAAAAAAAAAAAAAAAA',
-      '.AAAAAAAAAAAAAAAAAA',
-      'AAAAAAAAAAAAAAAAAAA',
-      'AAAAAAAAAAAAAAAAAAA',
+      '..SSSSSS..',
+      '.SSSSSSSS.',
+      'SSKSSSSKSS',
+      'SSWSSSSWSS',
+      'SSSSSSSSSS',
+      'SWSSSSSSWS',
+      '.SSSSSSSS.',
+      '.SSSSSSSS.',
+      '.SPPPPPPS.',
+      '.PPPPPPPP.',
     ]},
   },
 };
@@ -1235,53 +1150,58 @@ const PROJ_PALETTE = {
 };
 
 // ---- fighter palettes ----
-// Low-saturation, ominous. P is the signature color.
+// Body chars: S P p D G b K. Head chars per character: H M m T d B C c W k.
 const PALETTES = {
   kiro: {
-    P: '#3e6fa8', D: '#23232e', S: '#d6a273', K: '#10101a',
-    G: '#6f6f7a', W: '#e8e8f0',
+    S: '#d6a273', P: '#3e6fa8', p: '#35608f', D: '#23232e', G: '#6f6f7a',
+    b: '#16161e', K: '#10101a', H: '#3e6fa8', M: '#2c4f78',
+    W: '#e8ecf4', k: '#161620',
   },
   kiro_alt: {
-    P: '#2e8c84', D: '#23232e', S: '#d6a273', K: '#10101a',
-    G: '#6f6f7a', W: '#e8e8f0',
+    S: '#d6a273', P: '#2e8c84', p: '#27776f', D: '#23232e', G: '#6f6f7a',
+    b: '#16161e', K: '#10101a', H: '#2e8c84', M: '#1f6a62',
+    W: '#e8ecf4', k: '#161620',
   },
   ashkar: {
-    P: '#c07a1e', D: '#2e2326', S: '#d6a273', K: '#10101a',
-    G: '#6f6f7a', W: '#e8e8f0',
+    S: '#d6a273', P: '#c07a1e', p: '#a3661a', D: '#2e2326', G: '#6f6f7a',
+    b: '#1c1410', K: '#10101a', H: '#c07a1e', M: '#8a5414', m: '#a3661a',
+    W: '#e8ecf4', k: '#161620',
   },
   ashkar_alt: {
-    P: '#a83a2e', D: '#2e2326', S: '#d6a273', K: '#10101a',
-    G: '#6f6f7a', W: '#e8e8f0',
+    S: '#d6a273', P: '#a83a2e', p: '#8f3127', D: '#2e2326', G: '#6f6f7a',
+    b: '#1c1410', K: '#10101a', H: '#a83a2e', M: '#7a2a20', m: '#8f352a',
+    W: '#e8ecf4', k: '#161620',
   },
   voltan: {
-    P: '#c8c8d8', D: '#28283a', S: '#d6a273', K: '#10101a',
-    G: '#c8a030', W: '#ffffff',
+    S: '#d6a273', P: '#c8c8d8', p: '#b2b2c6', D: '#28283a', G: '#c8a030',
+    b: '#23283c', K: '#10101a', H: '#a89858', T: '#a89858', d: '#8a6a4e',
+    B: '#d8d8e0', W: '#ffffff', k: '#161620',
   },
   voltan_alt: {
-    P: '#8888c8', D: '#28283a', S: '#d6a273', K: '#10101a',
-    G: '#c8a030', W: '#ffffff',
+    S: '#d6a273', P: '#8888c8', p: '#7878b4', D: '#28283a', G: '#c8a030',
+    b: '#23283c', K: '#10101a', H: '#a89858', T: '#a89858', d: '#8a6a4e',
+    B: '#d8d8e0', W: '#ffffff', k: '#161620',
   },
   striker: {
-    P: '#4a7a3a', D: '#2a2a22', S: '#d6a273', K: '#10101a',
-    G: '#7a6a4a', W: '#e8e8f0',
+    S: '#d6a273', P: '#4a7a3a', p: '#3c6530', D: '#3a3a2c', G: '#7a6a4a',
+    b: '#26261e', K: '#262620', H: '#262620', B: '#5d8c4a',
+    C: '#3a5230', c: '#55663a', W: '#e8ecf4', k: '#161620',
   },
   striker_alt: {
-    P: '#8a8a4a', D: '#2a2a22', S: '#d6a273', K: '#10101a',
-    G: '#7a6a4a', W: '#e8e8f0',
+    S: '#d6a273', P: '#8a8a4a', p: '#74743c', D: '#3a3a2c', G: '#7a6a4a',
+    b: '#26261e', K: '#262620', H: '#262620', B: '#9aa45a',
+    C: '#55663a', c: '#6f7f4a', W: '#e8ecf4', k: '#161620',
   },
   gorruk: {
     P: '#7a2424', D: '#2a2020', S: '#b87848', K: '#140e0e',
     G: '#c8a030', W: '#e8e8f0',
   },
-  // frozen overlay palette: everything goes icy
+  // frozen overlay palette: everything goes icy (covers all fighter chars)
   ice: {
-    P: '#a8e0f4', D: '#5a9cc4', S: '#c4ecf8', K: '#3a7ca8',
-    G: '#7cc0dc', W: '#ffffff',
-  },
-  // white silhouette for the 2-frame hit flash
-  flash: {
-    P: '#ffffff', D: '#ffffff', S: '#ffffff', K: '#ffffff',
-    G: '#ffffff', W: '#ffffff',
+    S: '#c4ecf8', P: '#a8e0f4', p: '#90d4ec', D: '#5a9cc4', G: '#7cc0dc',
+    b: '#4a8cb4', K: '#3a7ca8', H: '#a8e0f4', M: '#7cc0dc', m: '#90d4ec',
+    T: '#a8e0f4', d: '#90d4ec', B: '#d8f4fc', C: '#7cc0dc', c: '#90d4ec',
+    W: '#ffffff', k: '#3a7ca8',
   },
 };
 
@@ -1341,6 +1261,27 @@ const TWINKLE_FRAMES = {
   b: { a: 0, r: ['.'] },
 };
 const TWINKLE_PALETTE = { W: '#e8e4f4' };
+const FIREFLY_PALETTE = { W: '#d8e87a' };
+const GLINT_PALETTE = { W: '#cfe6ff' };
+
+const BOLT_FRAMES = {
+  a: { a: 0, r: [
+    '......W',
+    '.....WW',
+    '....WW.',
+    '...WW..',
+    '...W...',
+    '..WWW..',
+    '....W..',
+    '...W...',
+    '..WW...',
+    '..W....',
+    '.W.....',
+    'WW.....',
+  ]},
+  b: { a: 0, r: ['.'] },
+};
+const BOLT_PALETTE = { W: '#e8e4ff' };
 
 // ---- stage backdrops ----
 // Painted on an 80x50 grid (every char is a color; '.' is the sky base) and
@@ -1472,6 +1413,121 @@ function buildTemple() {
   return bgDone(g);
 }
 
+function buildGrove() {
+  const g = bgMake('.');
+  bgRect(g, 0, 24, BG_W, 6, 'a');
+  bgRect(g, 0, 30, BG_W, 14, 'b');
+  // crescent moon (a dark disc bites the bright one)
+  bgDisc(g, 64, 8, 4, 'M');
+  bgDisc(g, 66, 7, 4, '.');
+  // mid-depth bamboo
+  for (const x of [16, 24, 56, 63]) {
+    bgRect(g, x, 6, 2, 38, 'B');
+    for (let y = 10; y < 44; y += 7) { g[y][x] = 'L'; g[y][x + 1] = 'L'; }
+  }
+  // foreground bamboo, thick and dark, with joint rings
+  for (const x of [4, 10, 69, 75]) {
+    bgRect(g, x, 0, 3, 44, 'K');
+    for (let y = 8; y < 44; y += 8) bgRect(g, x, y, 3, 1, 'L');
+  }
+  // hanging leaves
+  bgRow(g, 4, 12, 'KKK..KK');
+  bgRow(g, 6, 48, 'KK..KKK');
+  bgRow(g, 2, 28, 'BB.BB');
+  bgRow(g, 9, 33, 'B.BB');
+  // mossy floor with grass tufts
+  bgRect(g, 0, 44, BG_W, 6, 'G');
+  for (const [x, y] of [[7, 46], [19, 48], [33, 47], [47, 48], [61, 46], [71, 47]]) g[y][x] = 'T';
+  for (let x = 0; x < BG_W; x += 3) g[44][x] = 'H';
+  return bgDone(g);
+}
+
+function buildPeak() {
+  const g = bgMake('.');
+  bgRect(g, 0, 22, BG_W, 8, 'a');
+  bgRect(g, 0, 30, BG_W, 14, 'b');
+  // rippling aurora
+  for (let x = 0; x < BG_W; x++) {
+    const y = 5 + (((x >> 3) % 3 === 1) ? 2 : 0) + ((x >> 4) % 2);
+    g[y][x] = 'u'; g[y + 1][x] = 'v'; g[y + 2][x] = 'u';
+  }
+  bgDisc(g, 12, 6, 3, 'M');
+  // the great peak, snow-capped
+  for (let i = 0; i < 22; i++) bgRect(g, 38 - i, 22 + i, 2 + i * 2, 1, i < 5 ? 'S' : 'I');
+  for (let i = 0; i < 14; i++) bgRect(g, 64 - (i >> 1), 30 + i, 2 + i, 1, i < 3 ? 'S' : 'i');
+  // wind-swept snowfield
+  bgRect(g, 0, 44, BG_W, 6, 'G');
+  for (const [x, y] of [[10, 46], [24, 48], [40, 47], [55, 46], [68, 48]]) g[y][x] = 'g';
+  for (let x = 0; x < BG_W; x += 3) g[44][x] = 'H';
+  return bgDone(g);
+}
+
+function buildBridge() {
+  const g = bgMake('.');
+  // roiling storm clouds
+  bgRect(g, 0, 3, BG_W, 3, 'C');
+  bgRect(g, 8, 8, 30, 2, 'C');
+  bgRect(g, 48, 10, 26, 2, 'C');
+  bgRect(g, 0, 13, 18, 2, 'C');
+  bgRect(g, 30, 16, 40, 2, 'C');
+  // cliff walls dropping into the gorge
+  for (let i = 0; i < 22; i++) {
+    bgRect(g, 0, 22 + i, 16 - (i >> 1), 1, 'K');
+    bgRect(g, BG_W - 16 + (i >> 1), 22 + i, 16 - (i >> 1), 1, 'K');
+  }
+  // black gorge with falling mist streaks
+  bgRect(g, 18, 28, 44, 16, 'V');
+  for (const x of [26, 38, 52]) bgRect(g, x, 32, 1, 9, 'C');
+  // rope posts and sagging guard ropes
+  bgRect(g, 6, 28, 3, 16, 'K');
+  bgRect(g, 71, 28, 3, 16, 'K');
+  for (let x = 9; x < 71; x++) {
+    const t = (x - 40) / 31;
+    const y = 31 + Math.round(4 * (1 - t * t));
+    g[y][x] = 'R';
+    g[y + 6][x] = 'R';
+  }
+  // plank deck (the arena floor)
+  bgRect(g, 0, 44, BG_W, 6, 'G');
+  for (let x = 2; x < BG_W; x += 6) bgRect(g, x, 44, 1, 6, 'g');
+  for (let x = 0; x < BG_W; x += 3) g[44][x] = 'H';
+  return bgDone(g);
+}
+
+function buildThrone() {
+  const g = bgMake('.');
+  bgRect(g, 0, 0, BG_W, 6, 'a');
+  // stone columns
+  for (const x of [6, 70]) {
+    bgRect(g, x, 4, 4, 40, 'K');
+    bgRect(g, x - 1, 4, 6, 2, 'K');
+  }
+  // war banners with ragged hems
+  for (const x of [18, 56]) {
+    bgRect(g, x, 5, 6, 24, 'V');
+    bgRect(g, x + 2, 9, 2, 6, 'v');
+    bgRect(g, x, 27, 6, 2, 'v');
+    g[29][x + 1] = 'V'; g[29][x + 4] = 'V';
+  }
+  // the warlord's horned throne, empty -- he is in the arena
+  bgRect(g, 36, 12, 8, 2, 't');
+  bgRect(g, 37, 11, 2, 3, 't');
+  bgRect(g, 41, 11, 2, 3, 't');
+  bgRect(g, 34, 14, 12, 30, 't');
+  bgRect(g, 32, 18, 16, 26, 't');
+  bgRect(g, 30, 34, 20, 10, 't');
+  // brazier pedestals
+  bgRect(g, 13, 36, 5, 8, 'K');
+  bgRect(g, 12, 35, 7, 1, 'K');
+  bgRect(g, 62, 36, 5, 8, 'K');
+  bgRect(g, 61, 35, 7, 1, 'K');
+  // worn stone floor
+  bgRect(g, 0, 44, BG_W, 6, 'G');
+  for (let x = 5; x < BG_W; x += 12) g[47][x] = 'g';
+  for (let x = 0; x < BG_W; x += 3) g[44][x] = 'H';
+  return bgDone(g);
+}
+
 // note: decoration x/y are screen pixels; flames sit on the brazier tops
 const STAGE_ART = [
   {
@@ -1516,6 +1572,61 @@ const STAGE_ART = [
     anims: [
       { frames: GLOW_FRAMES, palette: GLOW_PALETTE, order: ['a', 'b'], x: 138, y: 80, period: 22 },
       { frames: GLOW_FRAMES, palette: GLOW_PALETTE, order: ['b', 'a'], x: 174, y: 80, period: 26 },
+    ],
+  },
+  {
+    name: 'BAMBOO GROVE',
+    palette: {
+      '.': '#0e1f16', a: '#142a1c', b: '#1b3624', M: '#c9d4b8',
+      K: '#06120c', B: '#1f4a2a', L: '#2a5c34', T: '#2a3c2c',
+      G: '#1c2a1e', g: '#15211a', H: '#3a503c',
+    },
+    line: '#3a503c',
+    rows: buildGrove(),
+    anims: [
+      { frames: TWINKLE_FRAMES, palette: FIREFLY_PALETTE, order: ['a', 'b'], x: 76, y: 118, period: 26 },
+      { frames: TWINKLE_FRAMES, palette: FIREFLY_PALETTE, order: ['b', 'a'], x: 152, y: 100, period: 34 },
+      { frames: TWINKLE_FRAMES, palette: FIREFLY_PALETTE, order: ['a', 'b'], x: 228, y: 128, period: 42 },
+    ],
+  },
+  {
+    name: 'FROZEN PEAK',
+    palette: {
+      '.': '#10182a', a: '#16213a', b: '#1d2b48', u: '#226a52', v: '#3a8a6a',
+      M: '#e8ecf4', I: '#3a5a8a', i: '#2c4668', S: '#c8d8ec',
+      G: '#536a8c', g: '#46597a', H: '#7088ac',
+    },
+    line: '#7088ac',
+    rows: buildPeak(),
+    anims: [
+      { frames: TWINKLE_FRAMES, palette: GLINT_PALETTE, order: ['a', 'b'], x: 96, y: 110, period: 30 },
+      { frames: TWINKLE_FRAMES, palette: GLINT_PALETTE, order: ['b', 'a'], x: 246, y: 140, period: 38 },
+    ],
+  },
+  {
+    name: 'STORM BRIDGE',
+    palette: {
+      '.': '#15131f', a: '#1c1930', C: '#2a2440', K: '#0b0a12', V: '#070610',
+      R: '#5a4632', G: '#3a2e22', g: '#241c12', H: '#52432f',
+    },
+    line: '#52432f',
+    rows: buildBridge(),
+    anims: [
+      { frames: BOLT_FRAMES, palette: BOLT_PALETTE, order: ['a', 'b', 'b', 'b'], x: 208, y: 12, period: 16 },
+      { frames: BOLT_FRAMES, palette: BOLT_PALETTE, order: ['b', 'b', 'a', 'b'], x: 64, y: 18, period: 21 },
+    ],
+  },
+  {
+    name: 'THRONE HALL',
+    palette: {
+      '.': '#241a2e', a: '#1a1222', K: '#140e1a', V: '#6a1a22', v: '#8a2a32',
+      t: '#0f0a14', G: '#33283c', g: '#2a2032', H: '#473a52',
+    },
+    line: '#473a52',
+    rows: buildThrone(),
+    anims: [
+      { frames: FLAME_FRAMES, palette: FLAME_PALETTE, order: ['a', 'b'], x: 57, y: 126, period: 10 },
+      { frames: FLAME_FRAMES, palette: FLAME_PALETTE, order: ['b', 'a'], x: 253, y: 126, period: 12 },
     ],
   },
 ];

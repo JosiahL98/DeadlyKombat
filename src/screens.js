@@ -10,7 +10,7 @@ function setScreen(s) { currentScreen = s; }
 
 function bakePortrait(charId) {
   const p = PORTRAIT_ART[charId];
-  return bakeFrame(p.frame, p.palette);
+  return bakeFrame(p.frame, p.palette, { flat: true });
 }
 
 function shuffled(arr) {
@@ -125,6 +125,7 @@ class SelectScreen {
           player: this.picked[0],
           rungs: shuffled(ROSTER).concat([BOSS_ID]),
           idx: 0,
+          stageOffset: (Math.random() * 6) | 0,   // vary arena order per run
         };
         setScreen(new LadderScreen(ladder));
         return;
@@ -156,7 +157,7 @@ class SelectScreen {
       g.fillStyle = '#1c1726';
       g.fillRect(x, y0, cellW, cellH);
       const pf = this.portraits[id];
-      g.drawImage(pf.cv, x + ((cellW - pf.w) >> 1), y0 + 2, pf.w, pf.h);
+      g.drawImage(pf.cv, x + ((cellW - pf.w * 2) >> 1), y0 + 4, pf.w * 2, pf.h * 2);
       drawText(g, CHARACTERS[id].name, x + cellW / 2, y0 + cellH + 5, 1, '#e8e8f0', 'center');
       // cursors
       const blink = (this.t / 10 | 0) % 2 === 0;
@@ -209,8 +210,10 @@ class LadderScreen {
         mode: 'cpu',
         aiLevel: LADDER_AI_LEVELS[Math.min(lad.idx, LADDER_AI_LEVELS.length - 1)],
         ladder: lad,
-        // the pit (stage 1) is reserved for the boss; others alternate
-        stage: lad.idx === lad.rungs.length - 1 ? 1 : (lad.idx % 2 ? 2 : 0),
+        // the pit (stage 1) is the boss arena; others rotate through the rest
+        stage: lad.idx === lad.rungs.length - 1
+          ? 1
+          : [0, 2, 3, 4, 5, 6][(lad.idx + (lad.stageOffset || 0)) % 6],
       }));
     }
   }
@@ -233,7 +236,7 @@ class LadderScreen {
       g.fillRect(x, y, 96, 24);
       const pf = this.portraits[id];
       g.globalAlpha = beaten ? 0.3 : 1;
-      g.drawImage(pf.cv, x + 2, y + 1, 20, 22);
+      g.drawImage(pf.cv, x + 2, y + 2, 20, 20);
       drawText(g, CHARACTERS[id].name, x + 28, y + 9, 1,
         beaten ? '#4a4a56' : isBoss ? '#c83030' : '#e8e8f0');
       g.globalAlpha = 1;
@@ -244,7 +247,7 @@ class LadderScreen {
     }
 
     // your fighter, bottom left
-    g.drawImage(this.playerPortrait.cv, 18, 148, 30, 33);
+    g.drawImage(this.playerPortrait.cv, 18, 150, 30, 30);
     drawText(g, 'YOU:', 18, 138, 1, '#8a8a96');
     drawText(g, CHARACTERS[lad.player].name, 18, 184, 1, '#e8c838');
 
